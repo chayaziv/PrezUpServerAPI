@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PrezUp.Core.IRepositories
 {
-    interface IRepository<T>
+    public interface IRepository<T>
     {
         public List<T> GetList();
 
