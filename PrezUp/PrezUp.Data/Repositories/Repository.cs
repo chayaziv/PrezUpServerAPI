@@ -9,7 +9,7 @@ using PrezUp.Core.IRepositories;
 
 namespace PrezUp.Data.Repositories
 {
-    class Repository<T> : IRepository<T> where T : class
+   public class Repository<T> : IRepository<T> where T : class
     {
         protected readonly DbSet<T> _dbSet;
 

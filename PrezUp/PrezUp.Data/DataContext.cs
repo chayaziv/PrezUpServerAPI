@@ -9,7 +9,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace PrezUp.Data
 {
-    class DataContext:DbContext
+   public class DataContext:DbContext
 
     {
         public DbSet<Presentation> Presentations { get; set; }

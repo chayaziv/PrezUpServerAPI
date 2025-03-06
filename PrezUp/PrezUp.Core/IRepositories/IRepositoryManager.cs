@@ -7,7 +7,7 @@ using PrezUp.Core.Entity;
 
 namespace PrezUp.Core.IRepositories
 {
-    interface IRepositoryManager
+   public interface IRepositoryManager
     {
         public IRepository <Presentation> Presentations { get; }
 
