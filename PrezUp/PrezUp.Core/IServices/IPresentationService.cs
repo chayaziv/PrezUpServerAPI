@@ -7,7 +7,7 @@ using PrezUp.Core.Entity;
 
 namespace PrezUp.Core.IServices
 {
-    interface IPresentationService
+   public interface IPresentationService
     {
         public Task<List<Presentation>> getallAsync();
 
