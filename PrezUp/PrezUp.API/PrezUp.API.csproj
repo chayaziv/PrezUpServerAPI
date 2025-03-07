@@ -12,10 +12,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PrezUp.Core\PrezUp.Core.csproj" />
+    <ProjectReference Include="..\PrezUp.Extesion\PrezUp.Extesion.csproj" />
   </ItemGroup>
 
 </Project>

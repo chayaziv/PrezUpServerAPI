@@ -13,5 +13,6 @@ namespace PrezUp.Core.IRepositories
 
         Task<int> SaveAsync();
 
+        Task<Presentation> SavePresentationAsync(AnalysisResult analysis);
     }
 }

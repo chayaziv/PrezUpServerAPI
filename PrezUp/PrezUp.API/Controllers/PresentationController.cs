@@ -66,5 +66,23 @@ namespace PrezUp.API.Controllers
                 return NotFound();
             return Ok();
         }
+        [HttpPost("analyze-audio")]
+        public async Task<IActionResult> AnalyzeAudio([FromForm] IFormFile audio)
+        {
+            if (audio == null || audio.Length == 0)
+            {
+                return BadRequest(new { error = "No audio file provided" });
+            }
+
+            try
+            {
+                var analysisResult = await _presentationService.AnalyzeAudioAsync(audio);
+                return Ok(new { message = "Audio analyzed successfully", data = analysisResult });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
     }
 }

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using PrezUp.Core.Entity;
+
 
 namespace PrezUp.Core.IServices
 {
@@ -18,5 +20,7 @@ namespace PrezUp.Core.IServices
         public Task<Presentation> updateAsync(int id, Presentation agreement);
 
         public Task<bool> deleteAsync(int id);
+
+        Task<AnalysisResult> AnalyzeAudioAsync(IFormFile audio);
     }
 }
