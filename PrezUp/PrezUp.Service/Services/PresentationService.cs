@@ -88,7 +88,7 @@ namespace PrezUp.Service.Services
                 var analysisResult = await SendAudioToNlpServerAsync(tempFilePath);
 
                 // עדכון הטבלה
-                await _presentationRepository.SavePresentationAsync(analysisResult);
+                await _repository.SavePresentationAsync(analysisResult);
 
                 return analysisResult;
             }
@@ -118,25 +118,42 @@ namespace PrezUp.Service.Services
             }
 
             var responseContent = await response.Content.ReadAsStringAsync();
-            JObject jsonObject = JObject.Parse(responseContent);
 
-            var result = new AnalysisResult
+            // מסנן את ה-JSON מבלי לבצע parsing מיותר.
+            var cleanedContent = responseContent
+                .Replace("```json", "")
+                .Replace("```", "")
+                .Trim();
+
+            // אם התוכן לא ריק, עובר לעיבוד JSON.
+            if (!string.IsNullOrEmpty(cleanedContent))
             {
-                Clarity = (int?)jsonObject["scores"]["clarity"]["score"] ?? 0,
-                ClarityFeedback = (string)jsonObject["scores"]["clarity"]["reason"],
-                Fluency = (int?)jsonObject["scores"]["fluency"]["score"] ?? 0,
-                FluencyFeedback = (string)jsonObject["scores"]["fluency"]["reason"],
-                Confidence = (int?)jsonObject["scores"]["confidence"]["score"] ?? 0,
-                ConfidenceFeedback = (string)jsonObject["scores"]["confidence"]["reason"],
-                Engagement = (int?)jsonObject["scores"]["engagement"]["score"] ?? 0,
-                EngagementFeedback = (string)jsonObject["scores"]["engagement"]["reason"],
-                SpeechStyle = (int?)jsonObject["scores"]["speech_style"]["score"] ?? 0,
-                SpeechStyleFeedback = (string)jsonObject["scores"]["speech_style"]["reason"],
-                Tips = (string)jsonObject["tips"]
-            };
-            result.Score = (result.Clarity + result.Fluency + result.Confidence + result.Engagement + result.SpeechStyle) / 5;
+                JObject jsonObject = JObject.Parse(cleanedContent);
+                Console.WriteLine("after SendAudioToNlpServerAsync" + jsonObject.ToString());
+                var result = new AnalysisResult
+                {
+                    Clarity = (int?)jsonObject["scores"]["clarity"]["score"] ?? 0,
+                    ClarityFeedback = (string)jsonObject["scores"]["clarity"]["reason"],
+                    Fluency = (int?)jsonObject["scores"]["fluency"]["score"] ?? 0,
+                    FluencyFeedback = (string)jsonObject["scores"]["fluency"]["reason"],
+                    Confidence = (int?)jsonObject["scores"]["confidence"]["score"] ?? 0,
+                    ConfidenceFeedback = (string)jsonObject["scores"]["confidence"]["reason"],
+                    Engagement = (int?)jsonObject["scores"]["engagement"]["score"] ?? 0,
+                    EngagementFeedback = (string)jsonObject["scores"]["engagement"]["reason"],
+                    SpeechStyle = (int?)jsonObject["scores"]["speech_style"]["score"] ?? 0,
+                    SpeechStyleFeedback = (string)jsonObject["scores"]["speech_style"]["reason"],
+                    Tips = (string)jsonObject["tips"]
+                };
 
-            return result;
+                result.Score = (result.Clarity + result.Fluency + result.Confidence + result.Engagement + result.SpeechStyle) / 5;
+
+                return result;
+            }
+            else
+            {
+                // טיפול במצב שבו התשובה לא תקינה או ריקה.
+                throw new Exception("Invalid JSON response from server.");
+            }
         }
     }
 }

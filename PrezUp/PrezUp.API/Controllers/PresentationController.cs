@@ -69,6 +69,7 @@ namespace PrezUp.API.Controllers
         [HttpPost("analyze-audio")]
         public async Task<IActionResult> AnalyzeAudio([FromForm] IFormFile audio)
         {
+            Console.WriteLine("----------------------------------");
             if (audio == null || audio.Length == 0)
             {
                 return BadRequest(new { error = "No audio file provided" });

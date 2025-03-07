@@ -21,5 +21,6 @@ namespace PrezUp.Core.Entity
         public string SpeechStyleFeedback { get; set; }
         public int Score { get; set; }
         public string Tips { get; set; }
+        
     }
 }
