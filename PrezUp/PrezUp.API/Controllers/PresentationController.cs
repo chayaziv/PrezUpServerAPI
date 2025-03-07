@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using PrezUp.Core.Entity;
 using PrezUp.Core.IServices;
 
@@ -20,23 +21,24 @@ namespace PrezUp.API.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<Presentation>> Get()
+        public async Task<ActionResult<List<Presentation>>> Get()
         {
-            return _presentationService.getall();
+            return await _presentationService.getallAsync();
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Presentation> Get(int id)
+        public async Task<ActionResult<Presentation>> Get(int id)
         {
-            if (_presentationService.getById(id) == null)
+            if (await _presentationService.getByIdAsync(id) == null)
                 return NotFound();
-            return Ok(_presentationService.getById(id));
+            return Ok(_presentationService.getByIdAsync(id));
         }
 
         [HttpPost]
-        public async Task<ActionResult<Presentation>> Post([FromBody] AgreementPostModel agreement)
+        public async Task<ActionResult<Presentation>> Post([FromBody] Presentation agreement)
         {
-            var dto = _mapper.Map<Presentation>(agreement);
+            //var dto = _mapper.Map<Presentation>(agreement);
+            var dto = agreement;
             var agreementAdd = await _presentationService.addAsync(dto);
             if (agreementAdd != null)
                 return Ok(agreementAdd);
