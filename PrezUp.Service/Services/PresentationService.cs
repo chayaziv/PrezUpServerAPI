@@ -41,7 +41,7 @@ namespace PrezUp.Service.Services
                 var analysisResult = await SendAudioToNlpServerAsync(tempFilePath);
 
                 // עדכון הטבלה
-                await _repository.SavePresentationAsync(analysisResult);
+                await _repository.Presentations.SaveAnalysisAsync(analysisResult);
                 _repository.SaveAsync();
                 return analysisResult;
             }

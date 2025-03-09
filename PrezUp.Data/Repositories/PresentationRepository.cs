@@ -19,5 +19,29 @@ namespace PrezUp.Data.Repositories
         {
            return await _dbSet.Where(pres => pres.UserId == userId).ToListAsync();
         }
+
+       
+        public async Task<Presentation> SaveAnalysisAsync(AnalysisResult analysisResult)
+        {
+            Presentation presentation = new Presentation()
+            {
+                Clarity = analysisResult.Clarity,
+                ClarityFeedback = analysisResult.ClarityFeedback,
+                Fluency = analysisResult.Fluency,
+                FluencyFeedback = analysisResult.FluencyFeedback,
+                Confidence = analysisResult.Confidence,
+                ConfidenceFeedback = analysisResult.ConfidenceFeedback,
+                Engagement = analysisResult.Engagement,
+                EngagementFeedback = analysisResult.EngagementFeedback,
+                SpeechStyle = analysisResult.SpeechStyle,
+                SpeechStyleFeedback = analysisResult.SpeechStyleFeedback,
+                Score = analysisResult.Score,
+                Tips = analysisResult.Tips,
+                UserId = 2
+
+            };
+            AddAsync(presentation);
+            return presentation;
+        }
     }
 }
