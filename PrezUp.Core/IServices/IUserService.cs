@@ -15,5 +15,7 @@ namespace PrezUp.Core.IServices
         Task<UserDTO> AddAsync(UserDTO user);
         Task<UserDTO> UpdateAsync(int id, UserDTO user);
         Task<bool> DeleteAsync(int id);
+
+        Task<List<PresentationDTO>> GetPresentationsByUserIdAsync(int userId);
     }
 }

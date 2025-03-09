@@ -12,11 +12,11 @@ namespace PrezUp.Data.Repositories
    public class RepositoryManager:IRepositoryManager
     {
         private readonly DataContext _context;
-        public IRepository<Presentation> Presentations { get; }
+        public IPresentationRepository Presentations { get; }
 
         public IRepository<User> Users { get; }
 
-        public RepositoryManager(DataContext context, IRepository<Presentation> presentations, IRepository<User> users)
+        public RepositoryManager(DataContext context, IPresentationRepository presentations, IRepository<User> users)
         {
             _context = context;
             Presentations = presentations;

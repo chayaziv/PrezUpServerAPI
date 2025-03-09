@@ -5,6 +5,7 @@ using PrezUp.API.PostEntity;
 using PrezUp.Core.Entity;
 using PrezUp.Core.EntityDTO;
 using PrezUp.Core.IServices;
+using PrezUp.Service.Services;
 
 namespace PrezUp.API.Controllers
 {
@@ -25,7 +26,12 @@ namespace PrezUp.API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<UserDTO>>> Get()
         {
-            return await _userService.GetAllAsync();
+            var users= await _userService.GetAllAsync();
+            if (users == null)
+            {
+                return NotFound("no users found");
+            }
+            return Ok(users);
         }
 
         [HttpGet("{id}")]
@@ -58,11 +64,24 @@ namespace PrezUp.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteAsync(int id)
+        public async Task<ActionResult> Delete(int id)
         {
             if (!await _userService.DeleteAsync(id))
                 return NotFound();
             return Ok();
+        }
+        
+        [HttpGet("{userId}/presentations")]
+        public async Task<ActionResult<List<PresentationDTO>>> GetUserPresentations(int userId)
+        {
+            var presentations = await _userService.GetPresentationsByUserIdAsync(userId);
+
+            if (presentations == null || presentations.Count == 0)
+            {
+                return NotFound("No presentations found for this user.");
+            }
+
+            return Ok(presentations);
         }
 
     }

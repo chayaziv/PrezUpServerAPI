@@ -24,12 +24,8 @@ namespace PrezUp.Service.Services
         public async Task<List<UserDTO>> GetAllAsync()
         {
             var list = await _repository.Users.GetListAsync();
-            var userDtos = new List<UserDTO>();
-            foreach (var item in list)
-            {
-               userDtos.Add( _mapper.Map<UserDTO>(item));
-            }
-            return userDtos;
+           
+           return _mapper.Map<List<UserDTO>>(list);
         }
 
         public async Task<UserDTO> GetByIdAsync(int id)
@@ -43,7 +39,7 @@ namespace PrezUp.Service.Services
             var model =  _mapper.Map<User>(user);
             await _repository.Users.AddAsync(model);
             await _repository.SaveAsync();
-            return user;
+            return _mapper.Map<UserDTO>(model);
         }
 
         public async Task<UserDTO> UpdateAsync(int id, UserDTO user)
@@ -61,5 +57,11 @@ namespace PrezUp.Service.Services
             await _repository.SaveAsync();
             return true;
         }
+        public async Task<List<PresentationDTO>> GetPresentationsByUserIdAsync(int userId)
+        {
+            var presentations=  await _repository.Presentations.GetPresentationsByUserIdAsync(userId);
+            return _mapper.Map<List<PresentationDTO>>(presentations);
+        }
+        
     }
 }

@@ -5,13 +5,12 @@ using PrezUp.Core.EntityDTO;
 
 namespace PrezUp.Core
 {
-   public class AutoMapperProfile:Profile
-   {
-       public AutoMapperProfile()
-       {
+    public class AutoMapperProfile : Profile
+    {
+        public AutoMapperProfile()
+        {
             CreateMap<Presentation, PresentationDTO>().ReverseMap();
-            CreateMap<User, UserDTO>().ReverseMap();
-            
-       }
-   }
+            CreateMap<User, UserDTO>().ReverseMap();       
+        }
+    }
 }
