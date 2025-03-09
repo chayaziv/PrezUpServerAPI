@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PrezUp.Core;
 using PrezUp.Core.IRepositories;
 using PrezUp.Core.IServices;
 using PrezUp.Data;
@@ -23,6 +24,7 @@ namespace PrezUp.Extesion
             s.AddScoped<IUserService, UserService>();
             s.AddScoped<IRepositoryManager, RepositoryManager>();
             s.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            s.AddAutoMapper(typeof(AutoMapperProfile));
             s.AddHttpClient();
             s.AddDbContext<DataContext>(optionsBuilder =>
             {

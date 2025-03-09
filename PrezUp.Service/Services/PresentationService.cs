@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using PrezUp.Core.Entity;
+using PrezUp.Core.EntityDTO;
 using PrezUp.Core.IRepositories;
 using PrezUp.Core.IServices;
 
@@ -15,13 +17,13 @@ namespace PrezUp.Service.Services
     {
         readonly IRepositoryManager _repository;
         private readonly IHttpClientFactory _httpClientFactory;
-        //readonly IMapper _mapper;
+        readonly IMapper _mapper;
 
-        public PresentationService(IRepositoryManager repository, IHttpClientFactory httpClientFactory)
+        public PresentationService(IRepositoryManager repository, IHttpClientFactory httpClientFactory, IMapper mapper)
         {
             _repository = repository;
             _httpClientFactory = httpClientFactory;
-            //_mapper = mapper;
+            _mapper = mapper;
         }
         public async Task<AnalysisResult> AnalyzeAudioAsync(IFormFile audio)
         {
@@ -109,48 +111,45 @@ namespace PrezUp.Service.Services
         public async Task<List<PresentationDTO>> getallAsync()
         {
             var list = await _repository.Presentations.GetListAsync();
-            //var listDTOs = new List<Presentation>();
-            //foreach (var item in list)
-            //{
-            //    listDTOs.Add(_mapper.Map<Presentation>(item));
-            //}
-           
-            return list;
+            var listDTOs = new List<PresentationDTO>();
+            foreach (var item in list)
+            {
+                listDTOs.Add(_mapper.Map<PresentationDTO>(item));
+            }
+            return listDTOs;
         }
 
         public async Task<PresentationDTO> getByIdAsync(int id)
         {
             var item = await _repository.Presentations.GetByIdAsync(id);
 
-            //return _mapper.Map<Presentation>(item);
-            
-            return item;
+            return _mapper.Map<PresentationDTO>(item);
         }
 
-        public async Task<PresentationDTO> addAsync(PresentationDTO agreement)
+        public async Task<PresentationDTO> addAsync(PresentationDTO presentationDto)
         {
-            //var model = _mapper.Map<Agreement>(agreement);
-            var model = agreement;
+            var model = _mapper.Map<Presentation>(presentationDto);
+
             await _repository.Presentations.AddAsync(model);
-
             await _repository.SaveAsync();
-            //return _mapper.Map<Presentation>(model);
-            return model;
+
+            return _mapper.Map<PresentationDTO>(model);
+
         }
 
-        public async Task<PresentationDTO> updateAsync(int id, PresentationDTO agreement)
+        public async Task<PresentationDTO> updateAsync(int id, PresentationDTO presentationDto)
         {
-            //var model = _mapper.Map<Agreement>(agreement);
-            var model = agreement;
-            var updated =  _repository.Presentations.UpdateAsync(model);
+            var model = _mapper.Map<Presentation>(presentationDto);
+            
+            var updated = _repository.Presentations.UpdateAsync(model);
             await _repository.SaveAsync();
-            //return _mapper.Map<Presentation>(updated);
-            return updated;
+            return _mapper.Map<PresentationDTO>(updated);
+           
         }
 
         public async Task<bool> deleteAsync(int id)
         {
-            PresentationDTO itemToDelete = await _repository.Presentations.GetByIdAsync(id);
+            Presentation itemToDelete = await _repository.Presentations.GetByIdAsync(id);
             _repository.Presentations.DeleteAsync(itemToDelete);
             await _repository.SaveAsync();
             return true;

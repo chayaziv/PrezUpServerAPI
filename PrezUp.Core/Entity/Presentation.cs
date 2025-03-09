@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace PrezUp.Core.Entity
 {
     [Table("Presentation")]
-    public class PresentationDTO
+    public class Presentation
     {
         [Key]
         public int Id { get; set; }    
@@ -32,7 +32,7 @@ namespace PrezUp.Core.Entity
         // קשר למשתמש
         public int UserId { get; set; }
         [ForeignKey("UserId")]
-        public UserDTO User { get; set; }
+        public User User { get; set; }
 
     }
 }

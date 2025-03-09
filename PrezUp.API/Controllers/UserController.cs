@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PrezUp.API.PostEntity;
 using PrezUp.Core.Entity;
+using PrezUp.Core.EntityDTO;
 using PrezUp.Core.IServices;
 
 namespace PrezUp.API.Controllers
@@ -11,10 +14,12 @@ namespace PrezUp.API.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        readonly IMapper _mapper;
 
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService,IMapper mapper)
         {
             _userService = userService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -33,18 +38,20 @@ namespace PrezUp.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<UserDTO>> Post([FromBody] UserDTO user)
+        public async Task<ActionResult<UserDTO>> Post([FromBody] UserPost user)
         {
-            var userAdd = await _userService.AddAsync(user);
+            var dto= _mapper.Map<UserDTO>(user);
+            var userAdd = await _userService.AddAsync(dto);
             if (userAdd != null)
                 return Ok(userAdd);
             return BadRequest(userAdd);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<UserDTO>> Put(int id, [FromBody] UserDTO user)
+        public async Task<ActionResult<UserDTO>> Put(int id, [FromBody] UserPost user)
         {
-            var userUpdate = await _userService.UpdateAsync(id, user);
+            var dto = _mapper.Map<UserDTO>(user);
+            var userUpdate = await _userService.UpdateAsync(id, dto);
             if (userUpdate != null)
                 return Ok(userUpdate);
             return NotFound(userUpdate);
@@ -57,5 +64,6 @@ namespace PrezUp.API.Controllers
                 return NotFound();
             return Ok();
         }
+
     }
 }

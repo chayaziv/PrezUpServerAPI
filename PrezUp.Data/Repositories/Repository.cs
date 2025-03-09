@@ -30,12 +30,14 @@ namespace PrezUp.Data.Repositories
         public async Task<T> AddAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
+            
             return entity;
         }
         public void DeleteAsync(T entity)
         {
            
             _dbSet.Remove(entity);
+            
         }
 
         public T UpdateAsync(T entity)

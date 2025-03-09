@@ -1,3 +1,4 @@
+using PrezUp.API;
 using PrezUp.Extesion;
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,7 @@ builder.Services.AddControllers();
 
 
 builder.Services.ServieDependencyInjector();
+builder.Services.AddAutoMapper(typeof(MappingPostEntity));
 
 builder.Services.AddOpenApi();
 

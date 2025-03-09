@@ -10,7 +10,7 @@ namespace PrezUp.Core.Entity
     using System.ComponentModel.DataAnnotations.Schema;
 
     [Table("User")]
-    public class UserDTO
+    public class User
     {
         [Key]
         public int Id { get; set; }
@@ -42,7 +42,7 @@ namespace PrezUp.Core.Entity
         public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
         public string AccountStatus { get; set; } = "Active";
 
-        public List<PresentationDTO> Presentations { get; set; } 
+        public List<Presentation> Presentations { get; set; } 
     }
 
 }

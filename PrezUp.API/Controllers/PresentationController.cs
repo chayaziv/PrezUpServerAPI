@@ -1,6 +1,9 @@
 ﻿using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using PrezUp.API.PostEntity;
 using PrezUp.Core.Entity;
+using PrezUp.Core.EntityDTO;
 using PrezUp.Core.IServices;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -12,12 +15,12 @@ namespace PrezUp.API.Controllers
     public class PresentationController : ControllerBase
     {
         readonly IPresentationService _presentationService;
-        //readonly IMapper _mapper;
+        readonly IMapper _mapper;
 
-        public PresentationController(IPresentationService service)
+        public PresentationController(IPresentationService service,IMapper mapper)
         {
             _presentationService = service;
-            //_mapper = mapper;
+            _mapper = mapper;
         }
         [HttpPost("analyze-audio")]
         public async Task<IActionResult> AnalyzeAudio([FromForm] IFormFile audio)
@@ -53,10 +56,9 @@ namespace PrezUp.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<PresentationDTO>> Post([FromBody] PresentationDTO agreement)
+        public async Task<ActionResult<PresentationDTO>> Post([FromBody] PresentationPost agreement)
         {
-            //var dto = _mapper.Map<Presentation>(agreement);
-            var dto = agreement;
+            var dto = _mapper.Map<PresentationDTO>(agreement);       
             var agreementAdd = await _presentationService.addAsync(dto);
             if (agreementAdd != null)
                 return Ok(agreementAdd);
@@ -65,10 +67,10 @@ namespace PrezUp.API.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<PresentationDTO>> Put(int id, [FromBody] PresentationDTO agreement)
+        public async Task<ActionResult<PresentationDTO>> Put(int id, [FromBody] PresentationPost agreement)
         {
-            //var dto = _mapper.Map<Presentation>(agreement);
-           var dto = agreement;
+            var dto = _mapper.Map<PresentationDTO>(agreement);
+           
             var agreementUpdate = await _presentationService.updateAsync(id, dto);
             if (agreementUpdate != null)
                 return Ok(agreementUpdate);

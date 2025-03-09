@@ -12,9 +12,9 @@ namespace PrezUp.Data
    public class DataContext:DbContext
 
     {
-        public DbSet<PresentationDTO> Presentations { get; set; }
+        public DbSet<Presentation> Presentations { get; set; }
 
-        public DbSet<UserDTO> Users { get; set; }
+        public DbSet<User> Users { get; set; }
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
 

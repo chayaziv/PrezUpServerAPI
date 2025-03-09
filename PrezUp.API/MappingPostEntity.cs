@@ -1,13 +1,15 @@
-﻿namespace PrezUp.API
+﻿using AutoMapper;
+using PrezUp.API.PostEntity;
+using PrezUp.Core.EntityDTO;
+
+namespace PrezUp.API
 {
-    public class MappingPostEntity:Profile
+    public class MappingPostEntity : Profile
     {
-        public MappingPostModel()
+        public MappingPostEntity()
         {
-            CreateMap<AgreementPostModel, AgreementDTO>();
-            CreateMap<CompanyPostModel, CompanyDTO>();
-            CreateMap<DeliveryManPostModel, DeliveryManDTO>();
-            CreateMap<SendingPostModel, SendingDTO>();
+            CreateMap<PresentationPost,PresentationDTO>();
+            CreateMap<UserPost, UserDTO>();
         }
     }
 }

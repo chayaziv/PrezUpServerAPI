@@ -9,11 +9,11 @@ namespace PrezUp.Core.IRepositories
 {
    public interface IRepositoryManager
     {
-        public IRepository <PresentationDTO> Presentations { get; }
-        public IRepository<UserDTO> Users { get; }
+        public IRepository <Presentation> Presentations { get; }
+        public IRepository<User> Users { get; }
 
         Task<int> SaveAsync();
 
-        Task<PresentationDTO> SavePresentationAsync(AnalysisResult analysis);
+        Task<Presentation> SavePresentationAsync(AnalysisResult analysis);
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PrezUp.Core.Entity;
+using PrezUp.Core.EntityDTO;
 
 namespace PrezUp.Core.IServices
 {

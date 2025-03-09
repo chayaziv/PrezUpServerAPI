@@ -12,11 +12,11 @@ namespace PrezUp.Data.Repositories
    public class RepositoryManager:IRepositoryManager
     {
         private readonly DataContext _context;
-        public IRepository<PresentationDTO> Presentations { get; }
+        public IRepository<Presentation> Presentations { get; }
 
-        public IRepository<UserDTO> Users { get; }
+        public IRepository<User> Users { get; }
 
-        public RepositoryManager(DataContext context, IRepository<PresentationDTO> presentations, IRepository<UserDTO> users)
+        public RepositoryManager(DataContext context, IRepository<Presentation> presentations, IRepository<User> users)
         {
             _context = context;
             Presentations = presentations;
@@ -27,9 +27,9 @@ namespace PrezUp.Data.Repositories
             return await _context.SaveChangesAsync();
         }
 
-        public async Task<PresentationDTO> SavePresentationAsync(AnalysisResult analysisResult)
+        public async Task<Presentation> SavePresentationAsync(AnalysisResult analysisResult)
         {
-            PresentationDTO presentation = new PresentationDTO()
+            Presentation presentation = new Presentation()
             {
                 Clarity = analysisResult.Clarity,
                 ClarityFeedback = analysisResult.ClarityFeedback,

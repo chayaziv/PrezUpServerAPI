@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using PrezUp.Core.Entity;
+using PrezUp.Core.EntityDTO;
 
 
 namespace PrezUp.Core.IServices
