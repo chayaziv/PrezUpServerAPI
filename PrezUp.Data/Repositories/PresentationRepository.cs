@@ -15,12 +15,12 @@ namespace PrezUp.Data.Repositories
         {
         }
 
-       public async Task<List<Presentation>> GetPresentationsByUserIdAsync(int userId)
+        public async Task<List<Presentation>> GetPresentationsByUserIdAsync(int userId)
         {
-           return await _dbSet.Where(pres => pres.UserId == userId).ToListAsync();
+            return await _dbSet.Where(pres => pres.UserId == userId).ToListAsync();
         }
 
-       
+
         public async Task<Presentation> SaveAnalysisAsync(AnalysisResult analysisResult)
         {
             Presentation presentation = new Presentation()

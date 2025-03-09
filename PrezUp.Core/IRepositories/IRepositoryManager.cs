@@ -13,7 +13,5 @@ namespace PrezUp.Core.IRepositories
         public IRepository<User> Users { get; }
 
         Task<int> SaveAsync();
-
-        //Task<Presentation> SavePresentationAsync(AnalysisResult analysis);
     }
 }
