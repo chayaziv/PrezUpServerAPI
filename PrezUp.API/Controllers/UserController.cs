@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PrezUp.API.PostEntity;
@@ -24,6 +25,7 @@ namespace PrezUp.API.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<List<UserDTO>>> Get()
         {
             var users= await _userService.GetAllAsync();
@@ -35,6 +37,7 @@ namespace PrezUp.API.Controllers
         }
 
         [HttpGet("{id}")]
+        
         public async Task<ActionResult<UserDTO>> Get(int id)
         {
             var user = await _userService.GetByIdAsync(id);

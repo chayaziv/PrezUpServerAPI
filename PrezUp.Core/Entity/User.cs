@@ -28,21 +28,56 @@ namespace PrezUp.Core.Entity
         public string PasswordHash { get; set; } = string.Empty;
 
         // תחום עיסוק בהייטק
-        public string JobTitle { get; set; } = string.Empty;
-        public string Company { get; set; } = string.Empty;
-        public int YearsOfExperience { get; set; }
+        public string? JobTitle{ get; set; } = string.Empty;
+        public string? Company { get; set; } = string.Empty;
+        public int? YearsOfExperience { get; set; }
             
 
         // אפשרויות משתמש
-        public bool CompareWithOthers { get; set; } = true;
-        public bool AllowPublicPresentations { get; set; } = false;
+        public bool? CompareWithOthers { get; set; } = true;
+        public bool? AllowPublicPresentations { get; set; } = false;
 
         
         // תיעוד סטטוס
-        public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
-        public string AccountStatus { get; set; } = "Active";
+       
+        public string? AccountStatus { get; set; } = "Active";
 
-        public List<Presentation> Presentations { get; set; } 
+        public List<Presentation> Presentations { get; set; }
+        //public List<UserRole> UserRoles { get; set; } = new();
     }
+
+    
+
+    //public class Role
+    //{
+    //    public int Id { get; set; }
+    //    public string RoleName { get; set; } = string.Empty;
+    //    public List<UserRole> UserRoles { get; set; } = new();
+    //    public List<RolePermission> RolePermissions { get; set; } = new();
+    //}
+
+    //public class Permission
+    //{
+    //    public int Id { get; set; }
+    //    public string PermissionName { get; set; } = string.Empty;
+    //}
+
+    //public class UserRole
+    //{
+    //    public int UserId { get; set; }
+    //    public User User { get; set; } = null!;
+    //    public int RoleId { get; set; }
+    //    public Role Role { get; set; } = null!;
+    //}
+
+    //public class RolePermission
+    //{
+    //    public int RoleId { get; set; }
+       
+    //    public Role Role { get; set; } = null!;
+    //    public int PermissionId { get; set; }
+    //    public Permission Permission { get; set; } = null!;
+    //}
+
 
 }

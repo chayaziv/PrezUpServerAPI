@@ -5,83 +5,81 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using PrezUp.Core.Entity;
 using PrezUp.Core.IRepositories;
+using PrezUp.Core.IServices;
+using PrezUp.Core.models;
+using System.IdentityModel.Tokens.Jwt;
+
+using Microsoft.IdentityModel.Tokens;
 
 namespace PrezUp.Service.Services
 {
-    class AuthService
+
+    public class AuthService : IAuthService
     {
         private readonly IRepositoryManager _repository;
         private readonly IConfiguration _configuration;
-       
 
-        public AuthService(IRepositoryManager manager,
-                           IConfiguration configuration)
+        public AuthService(IRepositoryManager repository, IConfiguration configuration)
         {
-            _repository=manager;
+            _repository = repository;
             _configuration = configuration;
         }
 
-        // רישום משתמש חדש
         public async Task<AuthResult> RegisterUserAsync(RegisterModel model)
         {
-            var user = new ApplicationUser
+            if (await _repository.Users.ExistsByEmailAsync(model.Email))
             {
-                UserName = model.UserName,
-                Email = model.Email
-            };
-
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (!result.Succeeded)
-            {
-                return new AuthResult { Succeeded = false, Errors = result.Errors.Select(e => e.Description).ToList() };
+                return new AuthResult { Succeeded = false, Errors = new List<string> { "Email already exists" } };
             }
 
-            // אפשר להוסיף תפקידים (Roles) אם רוצים
-            await _userManager.AddToRoleAsync(user, "Viewer");  // לדוגמה, לתת תפקיד "Viewer"
+            var newUser = new User
+            {
+                Email = model.Email,
+                Name = model.Email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password) // הצפנת הסיסמה
+            };
 
-            return new AuthResult { Succeeded = true };
+            await _repository.Users.AddAsync(newUser);
+            await _repository.SaveAsync();
+
+            var token = GenerateJwtToken(newUser);
+            return new AuthResult { Succeeded = true, Token = token };
         }
 
-        // כניסת משתמש (Login) - יצירת טוקן JWT
-        public async Task<string> LoginAsync(LoginModel model)
+
+        public async Task<AuthResult> LoginAsync(LoginModel model)
         {
-            var user = await _userManager.FindByNameAsync(model.UserName);
-            if (user == null)
-                return null;
+            var user = await _repository.Users.GetByEmailAsync(model.Email);
+            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
+            {
+                return new AuthResult { Succeeded = false, Errors = new List<string> { "Invalid email or password" } };
+            }
 
-            var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
-            if (!result.Succeeded)
-                return null;
-
-            // יצירת JWT
-            return GenerateJwtToken(user);
+            var token = GenerateJwtToken(user);
+            return new AuthResult { Succeeded = true, Token = token };
         }
 
-        // יצירת JWT
-        private string GenerateJwtToken(ApplicationUser user)
+
+        private string GenerateJwtToken(User user)
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Name),
+                new Claim(ClaimTypes.Email, user.Email),
             };
 
-            // הוספת תפקידים כ-Claims
-            var roles = _userManager.GetRolesAsync(user).Result;
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
 
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddHours(1),
+                _configuration["Jwt:Issuer"],
+                _configuration["Jwt:Audience"],
+                claims,
+                expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: credentials
             );
 
@@ -89,3 +87,5 @@ namespace PrezUp.Service.Services
         }
     }
 }
+
+

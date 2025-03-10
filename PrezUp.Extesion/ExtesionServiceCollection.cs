@@ -26,6 +26,8 @@ namespace PrezUp.Extesion
             s.AddScoped<IRepositoryManager, RepositoryManager>();
             s.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             s.AddScoped<IPresentationRepository, PresentationRepository>();
+            s.AddScoped<IUserRepository, UserRepository>();
+            s.AddScoped<IAuthService, AuthService>();
             s.AddAutoMapper(typeof(AutoMapperProfile));
             s.AddHttpClient();
             s.AddDbContext<DataContext>(optionsBuilder =>

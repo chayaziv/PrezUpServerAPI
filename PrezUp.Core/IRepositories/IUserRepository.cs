@@ -7,11 +7,10 @@ using PrezUp.Core.Entity;
 
 namespace PrezUp.Core.IRepositories
 {
-   public interface IRepositoryManager
+    public interface IUserRepository : IRepository<User>
     {
-        public IPresentationRepository Presentations { get; }
-        public IUserRepository Users { get; }
+        Task<bool> ExistsByEmailAsync(string email);
+        Task<User?> GetByEmailAsync(string email);
 
-        Task<int> SaveAsync();
     }
 }

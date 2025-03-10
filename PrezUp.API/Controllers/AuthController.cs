@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
+using PrezUp.Core.IServices;
+using PrezUp.Core.models;
 namespace PrezUp.API.Controllers
 {
     [Route("api/[controller]")]
@@ -14,29 +15,31 @@ namespace PrezUp.API.Controllers
             _authService = authService;
         }
 
-        // רישום משתמש חדש
+
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
             var result = await _authService.RegisterUserAsync(model);
 
             if (!result.Succeeded)
-                return BadRequest(result.Errors);
+                return BadRequest(new { result.Errors });
 
-            return Ok(new { Message = "User registered successfully." });
+            return Ok(new { result.Token, Message = "User registered successfully." });
         }
 
-        // כניסת משתמש (Login)
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            var token = await _authService.LoginAsync(model);
+            var result = await _authService.LoginAsync(model);
 
-            if (string.IsNullOrEmpty(token))
-                return Unauthorized(new { Message = "Invalid username or password." });
+            if (!result.Succeeded)
+                return Unauthorized(new { result.Errors });
 
-            return Ok(new { Token = token });
+            return Ok(new { result.Token, Message = "Login successful." });
         }
     }
 }
-}
+
+
+

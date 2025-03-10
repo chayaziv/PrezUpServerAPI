@@ -11,6 +11,6 @@ namespace PrezUp.Core.IServices
     {
 
         Task<AuthResult> RegisterUserAsync(RegisterModel model);
-        Task<string> LoginAsync(LoginModel model);
+        Task<AuthResult> LoginAsync(LoginModel model);
     }
 }

@@ -26,13 +26,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// הוספת הרשאות מבוססות-תפקידים
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("EditorOrAdmin", policy => policy.RequireRole("Editor", "Admin"));
-    options.AddPolicy("ViewerOnly", policy => policy.RequireRole("Viewer"));
-});
+
 
 builder.Services.ServieDependencyInjector();
 builder.Services.AddAutoMapper(typeof(MappingPostEntity));
@@ -50,22 +44,20 @@ builder.Services.AddCors(options =>
         });
 });
 
-//builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    //app.UseSwagger();
-    //app.UseSwaggerUI();
+   
 }
 
 app.UseCors("AllowAll");
 
 
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

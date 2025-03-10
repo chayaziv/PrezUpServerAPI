@@ -14,9 +14,9 @@ namespace PrezUp.Data.Repositories
         private readonly DataContext _context;
         public IPresentationRepository Presentations { get; }
 
-        public IRepository<User> Users { get; }
+        public IUserRepository Users { get; }
 
-        public RepositoryManager(DataContext context, IPresentationRepository presentations, IRepository<User> users)
+        public RepositoryManager(DataContext context, IPresentationRepository presentations, IUserRepository users)
         {
             _context = context;
             Presentations = presentations;
