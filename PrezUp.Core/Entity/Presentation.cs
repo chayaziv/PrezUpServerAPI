@@ -13,7 +13,7 @@ namespace PrezUp.Core.Entity
     {
         [Key]
         public int Id { get; set; }    
-        public string FileUrl { get; set; } = string.Empty;
+        public string? FileUrl { get; set; } = string.Empty;
         public int Clarity { get; set; }
         public string ClarityFeedback { get; set; }
         public int Fluency { get; set; }
@@ -29,6 +29,7 @@ namespace PrezUp.Core.Entity
         public int Score { get; set; }
         public string Tips { get; set; }
 
+        public bool IsPublic { get; set; }
         // קשר למשתמש
         public int UserId { get; set; }
         [ForeignKey("UserId")]

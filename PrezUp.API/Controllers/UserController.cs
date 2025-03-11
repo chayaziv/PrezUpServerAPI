@@ -12,7 +12,7 @@ namespace PrezUp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-   
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -24,8 +24,7 @@ namespace PrezUp.API.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        [Authorize]
+        [HttpGet]      
         public async Task<ActionResult<List<UserDTO>>> Get()
         {
             var users= await _userService.GetAllAsync();

@@ -37,7 +37,7 @@ namespace PrezUp.Service.Services
             var newUser = new User
             {
                 Email = model.Email,
-                Name = model.Email,
+                Name = model.UserName,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password) // הצפנת הסיסמה
             };
 

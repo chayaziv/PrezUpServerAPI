@@ -22,7 +22,11 @@ namespace PrezUp.API.Controllers
             var result = await _authService.RegisterUserAsync(model);
 
             if (!result.Succeeded)
+            {
+                Console.WriteLine(result.Errors.First());
                 return BadRequest(new { result.Errors });
+            }
+                
 
             return Ok(new { result.Token, Message = "User registered successfully." });
         }

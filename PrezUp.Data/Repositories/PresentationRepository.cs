@@ -21,7 +21,7 @@ namespace PrezUp.Data.Repositories
         }
 
 
-        public async Task<Presentation> SaveAnalysisAsync(AnalysisResult analysisResult)
+        public async Task<Presentation> SaveAnalysisAsync(AnalysisResult analysisResult, bool isPublic, int userId)
         {
             Presentation presentation = new Presentation()
             {
@@ -37,7 +37,8 @@ namespace PrezUp.Data.Repositories
                 SpeechStyleFeedback = analysisResult.SpeechStyleFeedback,
                 Score = analysisResult.Score,
                 Tips = analysisResult.Tips,
-                UserId = 2
+                UserId = userId,
+                IsPublic=isPublic
 
             };
             AddAsync(presentation);

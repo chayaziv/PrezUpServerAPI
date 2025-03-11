@@ -25,7 +25,7 @@ namespace PrezUp.Service.Services
             _httpClientFactory = httpClientFactory;
             _mapper = mapper;
         }
-        public async Task<AnalysisResult> AnalyzeAudioAsync(IFormFile audio)
+        public async Task<AnalysisResult> AnalyzeAudioAsync(IFormFile audio, bool isPublic, int userId)
         {
             var tempFilePath = Path.Combine(Directory.GetCurrentDirectory(), "temp_audio.wav");
 
@@ -41,8 +41,12 @@ namespace PrezUp.Service.Services
                 var analysisResult = await SendAudioToNlpServerAsync(tempFilePath);
 
                 // עדכון הטבלה
-                await _repository.Presentations.SaveAnalysisAsync(analysisResult);
-                _repository.SaveAsync();
+                await _repository.Presentations.SaveAnalysisAsync(analysisResult,isPublic,userId);
+                int res= await _repository.SaveAsync();
+                if (res ==0)
+                {
+                    return null;
+                }
                 return analysisResult;
             }
             finally
@@ -98,7 +102,7 @@ namespace PrezUp.Service.Services
                 };
 
                 result.Score = (result.Clarity + result.Fluency + result.Confidence + result.Engagement + result.SpeechStyle) / 5;
-
+                
                 return result;
             }
             else
@@ -126,26 +130,7 @@ namespace PrezUp.Service.Services
             return _mapper.Map<PresentationDTO>(item);
         }
 
-        public async Task<PresentationDTO> addAsync(PresentationDTO presentationDto)
-        {
-            var model = _mapper.Map<Presentation>(presentationDto);
-
-            await _repository.Presentations.AddAsync(model);
-            await _repository.SaveAsync();
-
-            return _mapper.Map<PresentationDTO>(model);
-
-        }
-
-        public async Task<PresentationDTO> updateAsync(int id, PresentationDTO presentationDto)
-        {
-            var model = _mapper.Map<Presentation>(presentationDto);
-            
-            var updated = _repository.Presentations.UpdateAsync(model);
-            await _repository.SaveAsync();
-            return _mapper.Map<PresentationDTO>(updated);
-           
-        }
+       
 
         public async Task<bool> deleteAsync(int id)
         {
@@ -159,3 +144,23 @@ namespace PrezUp.Service.Services
     }
 }
 
+//public async Task<PresentationDTO> addAsync(PresentationDTO presentationDto)
+//{
+//    var model = _mapper.Map<Presentation>(presentationDto);
+
+//    await _repository.Presentations.AddAsync(model);
+//    await _repository.SaveAsync();
+
+//    return _mapper.Map<PresentationDTO>(model);
+
+//}
+
+//public async Task<PresentationDTO> updateAsync(int id, PresentationDTO presentationDto)
+//{
+//    var model = _mapper.Map<Presentation>(presentationDto);
+
+//    var updated = _repository.Presentations.UpdateAsync(model);
+//    await _repository.SaveAsync();
+//    return _mapper.Map<PresentationDTO>(updated);
+
+//}
