@@ -16,12 +16,12 @@ namespace PrezUp.Core.IServices
 
         public Task<PresentationDTO> getByIdAsync(int id);
 
-        public Task<PresentationDTO> addAsync(PresentationDTO agreement);
+        //public Task<PresentationDTO> addAsync(PresentationDTO agreement);
 
-        public Task<PresentationDTO> updateAsync(int id, PresentationDTO agreement);
+        //public Task<PresentationDTO> updateAsync(int id, PresentationDTO agreement);
 
         public Task<bool> deleteAsync(int id);
 
-        Task<AnalysisResult> AnalyzeAudioAsync(IFormFile audio);
+        Task<AnalysisResult> AnalyzeAudioAsync(IFormFile audio, bool isPublic, int userId);
     }
 }

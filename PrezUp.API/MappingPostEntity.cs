@@ -8,7 +8,7 @@ namespace PrezUp.API
     {
         public MappingPostEntity()
         {
-            CreateMap<PresentationPost,PresentationDTO>();
+            //CreateMap<PresentationPost,PresentationDTO>();
             CreateMap<UserPost, UserDTO>();
         }
     }
