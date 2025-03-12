@@ -39,7 +39,7 @@ namespace PrezUp.Service.Services
         {
             var tempFilePath = Path.Combine(Directory.GetCurrentDirectory(), "temp_audio.wav");
 
-            // שמירת קובץ האודיו
+            
             using (var stream = new FileStream(tempFilePath, FileMode.Create))
             {
                 await audio.CopyToAsync(stream);
@@ -49,11 +49,11 @@ namespace PrezUp.Service.Services
             {
                 fileUrl = await UploadFileToS3Async(tempFilePath, "my-audio-files-presentations", "recordings/" + Guid.NewGuid() + ".wav");
                 
-                // שליחה לשרת פייתון
+                
                 var audioResult = await SendAudioToNlpServerAsync(tempFilePath);
                 if(audioResult.Succeeded)
                 {
-                    // עדכון הטבלה
+                   
                     await _repository.Presentations.SaveAnalysisAsync(audioResult.analysis, isPublic, userId,fileUrl);
                     int res = await _repository.SaveAsync();
                     if (res == 0)
@@ -70,7 +70,7 @@ namespace PrezUp.Service.Services
             }
             finally
             {
-                // מחיקת קובץ אחרי שליחה
+                
                 if (System.IO.File.Exists(tempFilePath))
                 {
                     System.IO.File.Delete(tempFilePath);
@@ -81,22 +81,18 @@ namespace PrezUp.Service.Services
         private async Task<string> UploadFileToS3Async(string filePath, string bucketName, string objectKey)
         {
 
-            //Env.Load();
-            //// שליפת מפתחות ה-AWS מתוך משתני סביבה
-            //var accessKey = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID");
-            //var secretKey = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY");
-
+            
 
             var accessKey = _configuration["AWS:AccessKey"];
             var secretKey = _configuration["AWS:SecretKey"];
 
-            // אם אין ערכים במשתני סביבה, אפשר להרים חריגה או לספק ערכים ברירת מחדל
+          
             if (string.IsNullOrEmpty(accessKey) || string.IsNullOrEmpty(secretKey))
             {
                 throw new InvalidOperationException("AWS credentials are not set in the environment variables.");
             }
 
-            // יצירת לקוח S3 עם המפתחות שנשלפו
+           
             var s3Client = new AmazonS3Client(accessKey, secretKey, RegionEndpoint.EUNorth1);
             var fileTransferUtility = new TransferUtility(s3Client);
             await fileTransferUtility.UploadAsync(filePath, bucketName, objectKey);
@@ -184,10 +180,20 @@ namespace PrezUp.Service.Services
 
             return _mapper.Map<PresentationDTO>(item);
         }
+        public async Task<List<PresentationDTO>> GetPublicPresentationsAsync()
+        {
+            var list = await _repository.Presentations.GetPublicPresentationsAsync();
+            var listDTOs = new List<PresentationDTO>();
+            foreach (var item in list)
+            {
+                listDTOs.Add(_mapper.Map<PresentationDTO>(item));
+            }
+            return listDTOs;
+        }
 
-       
 
-        
+
+
         public async Task<bool> deleteAsync(int id, int userId)
         {
             Presentation itemToDelete = await _repository.Presentations.GetByIdAsync(id);
@@ -196,7 +202,7 @@ namespace PrezUp.Service.Services
                 throw new KeyNotFoundException("Presentation not found");
             }
 
-            // בדיקה שהמשתמש הנוכחי הוא הבעלים של הפרזנטציה
+           
             if (itemToDelete.UserId != userId)
             {
                 throw new UnauthorizedAccessException("You are not authorized to delete this presentation");

@@ -77,6 +77,13 @@ namespace PrezUp.API.Controllers
                 return NotFound();
             return Ok(_presentationService.getByIdAsync(id));
         }
+        [HttpGet("public")]
+        public async Task<ActionResult<List<PresentationDTO>>> GetPublicPresentations()
+        {
+            var presentations = await _presentationService.GetPublicPresentationsAsync();
+            return Ok(presentations);
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePresentation(int id)
         {

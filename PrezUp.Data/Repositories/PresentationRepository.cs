@@ -19,6 +19,10 @@ namespace PrezUp.Data.Repositories
         {
             return await _dbSet.Where(pres => pres.UserId == userId).ToListAsync();
         }
+        public async Task<List<Presentation>> GetPublicPresentationsAsync()
+        {
+            return await _dbSet.Where(pres => pres.IsPublic).ToListAsync();
+        }
 
 
         public async Task<Presentation> SaveAnalysisAsync(AnalysisResult analysisResult, bool isPublic, int userId,string fileUrl)
