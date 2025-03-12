@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -73,9 +74,22 @@ namespace PrezUp.API.Controllers
             return Ok();
         }
         
-        [HttpGet("{userId}/presentations")]
-        public async Task<ActionResult<List<PresentationDTO>>> GetUserPresentations(int userId)
+        
+        [HttpGet("my-presentations")]
+        public async Task<ActionResult<List<PresentationDTO>>> GetUserPresentations()
         {
+          
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { error = "User ID not found in token" });
+            }
+           
+            if (!int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return BadRequest("Invalid user ID in token.");
+            }
+
             var presentations = await _userService.GetPresentationsByUserIdAsync(userId);
 
             if (presentations == null || presentations.Count == 0)
@@ -85,6 +99,7 @@ namespace PrezUp.API.Controllers
 
             return Ok(presentations);
         }
+
 
     }
 }

@@ -95,11 +95,13 @@ namespace PrezUp.API.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return StatusCode(404, new { message = ex.Message });
+
             }
             catch (UnauthorizedAccessException ex)
             {
-                return Forbid();
+                return StatusCode(403, new { message = ex.Message });
+
             }
             catch (Exception )
             {

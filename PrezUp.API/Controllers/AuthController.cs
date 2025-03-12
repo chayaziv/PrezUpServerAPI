@@ -26,9 +26,9 @@ namespace PrezUp.API.Controllers
                 Console.WriteLine(result.Errors.First());
                 return BadRequest(new { result.Errors });
             }
-                
 
-            return Ok(new { result.Token, Message = "User registered successfully." });
+
+            return Ok(new { result.Token, Message = "User registered successfully.", user = result.User });
         }
 
 
@@ -40,7 +40,7 @@ namespace PrezUp.API.Controllers
             if (!result.Succeeded)
                 return Unauthorized(new { result.Errors });
 
-            return Ok(new { result.Token, Message = "Login successful." });
+            return Ok(new { result.Token, Message = "Login successful.", user = result.User });
         }
     }
 }

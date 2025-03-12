@@ -12,6 +12,8 @@ using PrezUp.Core.models;
 using System.IdentityModel.Tokens.Jwt;
 
 using Microsoft.IdentityModel.Tokens;
+using AutoMapper;
+using PrezUp.Core.EntityDTO;
 
 namespace PrezUp.Service.Services
 {
@@ -20,11 +22,13 @@ namespace PrezUp.Service.Services
     {
         private readonly IRepositoryManager _repository;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
 
-        public AuthService(IRepositoryManager repository, IConfiguration configuration)
+        public AuthService(IRepositoryManager repository, IConfiguration configuration, IMapper mapper)
         {
             _repository = repository;
             _configuration = configuration;
+            _mapper = mapper;
         }
 
         public async Task<AuthResult> RegisterUserAsync(RegisterModel model)
@@ -43,22 +47,22 @@ namespace PrezUp.Service.Services
 
             await _repository.Users.AddAsync(newUser);
             await _repository.SaveAsync();
-
+            var userDto = _mapper.Map<UserDTO>(newUser);
             var token = GenerateJwtToken(newUser);
-            return new AuthResult { Succeeded = true, Token = token };
+            return new AuthResult { Succeeded = true, Token = token , User=userDto};
         }
 
 
         public async Task<AuthResult> LoginAsync(LoginModel model)
         {
-            var user = await _repository.Users.GetByEmailAsync(model.Email);
-            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
+            var existUser = await _repository.Users.GetByEmailAsync(model.Email);
+            if (existUser == null || !BCrypt.Net.BCrypt.Verify(model.Password, existUser.PasswordHash))
             {
                 return new AuthResult { Succeeded = false, Errors = new List<string> { "Invalid email or password" } };
             }
-
-            var token = GenerateJwtToken(user);
-            return new AuthResult { Succeeded = true, Token = token };
+            var userDto = _mapper.Map<UserDTO>(existUser);
+            var token = GenerateJwtToken(existUser);
+            return new AuthResult { Succeeded = true, Token = token, User = userDto };
         }
 
 
