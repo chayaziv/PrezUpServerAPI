@@ -28,7 +28,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 
 
-builder.Services.ServieDependencyInjector();
+builder.Services.ServieDependencyInjector(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(MappingPostEntity));
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 

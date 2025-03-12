@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PrezUp.Core;
 using PrezUp.Core.Entity;
@@ -17,10 +18,8 @@ namespace PrezUp.Extesion
 {
      public static class ExtesionServiceCollection
     {
-        public static void ServieDependencyInjector(this IServiceCollection s)
+        public static void ServieDependencyInjector(this IServiceCollection s, IConfiguration configuration)
         {
-
-            
             s.AddScoped<IPresentationService, PresentationService>();
             s.AddScoped<IUserService, UserService>();
             s.AddScoped<IRepositoryManager, RepositoryManager>();
@@ -29,12 +28,12 @@ namespace PrezUp.Extesion
             s.AddScoped<IUserRepository, UserRepository>();
             s.AddScoped<IAuthService, AuthService>();
             s.AddAutoMapper(typeof(AutoMapperProfile));
-            s.AddHttpClient();
-            
+            s.AddHttpClient();       
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+
             s.AddDbContext<DataContext>(optionsBuilder =>
             {
-                optionsBuilder.UseSqlServer("Data Source = DESKTOP-13C4MS2; Initial Catalog = PrezUp_DB; Integrated Security = true;TrustServerCertificate=True");
-
+                optionsBuilder.UseSqlServer(connectionString);
             });
 
 
