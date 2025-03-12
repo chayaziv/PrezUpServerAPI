@@ -29,7 +29,7 @@ namespace PrezUp.API.Controllers
         [Authorize]
         public async Task<IActionResult> AnalyzeAudio([FromForm] IFormFile audio, [FromForm] bool isPublic)
         {
-            Console.WriteLine("in AnalyzeAudio");
+           
             if (audio == null || audio.Length == 0)
             {
                 return BadRequest(new { error = "No audio file provided" });
@@ -46,12 +46,18 @@ namespace PrezUp.API.Controllers
                 }
 
                 int userId = int.Parse(userIdClaim.Value);
-                Console.WriteLine("-----------------------------ללללללללללללללללללללללללללללללללללללללננננננננ: "+userId);
+               
                 // שליחת userId ל-Service
                 var analysisResult = await _presentationService.AnalyzeAudioAsync(audio, isPublic, userId);
-                return Ok(new { message = "Audio analyzed successfully", data = analysisResult });
-
-                
+                if(analysisResult.Succeeded)
+                {
+                    return Ok(new { message = "Audio analyzed successfully", data = analysisResult.analysis });
+                }
+                else
+                {
+                    return StatusCode(500, analysisResult.Errors);
+                }
+                                
             }
             catch (Exception ex)
             {
@@ -71,35 +77,27 @@ namespace PrezUp.API.Controllers
                 return NotFound();
             return Ok(_presentationService.getByIdAsync(id));
         }
-
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteAsync(int id)
+        public async Task<IActionResult> DeletePresentation(int id)
         {
-            if (!await _presentationService.deleteAsync(id))
-                return NotFound();
-            return Ok();
-        }
-       
+            try
+            {
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                await _presentationService.deleteAsync(id, userId);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid();
+            }
+            catch (Exception )
+            {
+                return StatusCode(500, new { message = "An unexpected error occurred" });
+            }
+        }     
     }
 }
-//[HttpPost]
-//public async Task<ActionResult<PresentationDTO>> Post([FromBody] PresentationPost agreement)
-//{
-//    var dto = _mapper.Map<PresentationDTO>(agreement);       
-//    var agreementAdd = await _presentationService.addAsync(dto);
-//    if (agreementAdd != null)
-//        return Ok(agreementAdd);
-//    return BadRequest(agreementAdd);
-//}
-
-
-//[HttpPut("{id}")]
-//public async Task<ActionResult<PresentationDTO>> Put(int id, [FromBody] PresentationPost agreement)
-//{
-//    var dto = _mapper.Map<PresentationDTO>(agreement);
-
-//    var agreementUpdate = await _presentationService.updateAsync(id, dto);
-//    if (agreementUpdate != null)
-//        return Ok(agreementUpdate);
-//    return NotFound(agreementUpdate);
-//}

@@ -30,6 +30,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.ServieDependencyInjector();
 builder.Services.AddAutoMapper(typeof(MappingPostEntity));
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
 builder.Services.AddOpenApi();
 

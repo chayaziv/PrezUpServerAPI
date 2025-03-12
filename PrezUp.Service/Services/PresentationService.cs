@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Amazon.S3.Transfer;
+using Amazon.S3;
+using Amazon;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
@@ -10,6 +13,10 @@ using PrezUp.Core.Entity;
 using PrezUp.Core.EntityDTO;
 using PrezUp.Core.IRepositories;
 using PrezUp.Core.IServices;
+using PrezUp.Core.models;
+
+using Microsoft.Extensions.Configuration;
+
 
 namespace PrezUp.Service.Services
 {
@@ -18,14 +25,17 @@ namespace PrezUp.Service.Services
         readonly IRepositoryManager _repository;
         private readonly IHttpClientFactory _httpClientFactory;
         readonly IMapper _mapper;
+        private readonly IConfiguration _configuration;
 
-        public PresentationService(IRepositoryManager repository, IHttpClientFactory httpClientFactory, IMapper mapper)
+        
+        public PresentationService(IRepositoryManager repository, IHttpClientFactory httpClientFactory, IMapper mapper, IConfiguration configuration)
         {
             _repository = repository;
             _httpClientFactory = httpClientFactory;
             _mapper = mapper;
+            _configuration = configuration;
         }
-        public async Task<AnalysisResult> AnalyzeAudioAsync(IFormFile audio, bool isPublic, int userId)
+        public async Task<AudioResult> AnalyzeAudioAsync(IFormFile audio, bool isPublic, int userId)
         {
             var tempFilePath = Path.Combine(Directory.GetCurrentDirectory(), "temp_audio.wav");
 
@@ -34,20 +44,29 @@ namespace PrezUp.Service.Services
             {
                 await audio.CopyToAsync(stream);
             }
-
+            string fileUrl = string.Empty;
             try
             {
+                fileUrl = await UploadFileToS3Async(tempFilePath, "my-audio-files-presentations", "recordings/" + Guid.NewGuid() + ".wav");
+                
                 // שליחה לשרת פייתון
-                var analysisResult = await SendAudioToNlpServerAsync(tempFilePath);
-
-                // עדכון הטבלה
-                await _repository.Presentations.SaveAnalysisAsync(analysisResult,isPublic,userId);
-                int res= await _repository.SaveAsync();
-                if (res ==0)
+                var audioResult = await SendAudioToNlpServerAsync(tempFilePath);
+                if(audioResult.Succeeded)
                 {
-                    return null;
+                    // עדכון הטבלה
+                    await _repository.Presentations.SaveAnalysisAsync(audioResult.analysis, isPublic, userId,fileUrl);
+                    int res = await _repository.SaveAsync();
+                    if (res == 0)
+                    {
+                        return new AudioResult() { Succeeded = false, Errors = { "errors in save to database" } };
+                    }
+                    return audioResult;
                 }
-                return analysisResult;
+                else
+                {
+                    return audioResult;
+                }
+                    
             }
             finally
             {
@@ -58,7 +77,34 @@ namespace PrezUp.Service.Services
                 }
             }
         }
-        private async Task<AnalysisResult> SendAudioToNlpServerAsync(string filePath)
+        
+        private async Task<string> UploadFileToS3Async(string filePath, string bucketName, string objectKey)
+        {
+
+            //Env.Load();
+            //// שליפת מפתחות ה-AWS מתוך משתני סביבה
+            //var accessKey = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID");
+            //var secretKey = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY");
+
+
+            var accessKey = _configuration["AWS:AccessKey"];
+            var secretKey = _configuration["AWS:SecretKey"];
+
+            // אם אין ערכים במשתני סביבה, אפשר להרים חריגה או לספק ערכים ברירת מחדל
+            if (string.IsNullOrEmpty(accessKey) || string.IsNullOrEmpty(secretKey))
+            {
+                throw new InvalidOperationException("AWS credentials are not set in the environment variables.");
+            }
+
+            // יצירת לקוח S3 עם המפתחות שנשלפו
+            var s3Client = new AmazonS3Client(accessKey, secretKey, RegionEndpoint.EUNorth1);
+            var fileTransferUtility = new TransferUtility(s3Client);
+            await fileTransferUtility.UploadAsync(filePath, bucketName, objectKey);
+
+            return $"https://{bucketName}.s3.amazonaws.com/{objectKey}";
+        }
+
+        private async Task<AudioResult> SendAudioToNlpServerAsync(string filePath)
         {
             using var client = _httpClientFactory.CreateClient();
 
@@ -67,13 +113,21 @@ namespace PrezUp.Service.Services
     {
         {   new StreamContent(fileStream), "audio", "temp_audio.wav" }
     };
-
-            var response = await client.PostAsync("http://localhost:5000/analyze-audio", content);
-
-            if (!response.IsSuccessStatusCode)
+            HttpResponseMessage response;
+            try
             {
-                throw new Exception("Failed to analyze audio");
+                 response = await client.PostAsync("http://localhost:5000/analyze-audio", content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new AudioResult() { Succeeded = false, Errors = { "errors in NLP server,failed to analayze audio" } };
+                }
             }
+            catch(Exception e)
+            {
+                return new AudioResult() { Errors = { e.Message }, Succeeded = false };
+            }
+            
 
             var responseContent = await response.Content.ReadAsStringAsync();
 
@@ -102,12 +156,13 @@ namespace PrezUp.Service.Services
                 };
 
                 result.Score = (result.Clarity + result.Fluency + result.Confidence + result.Engagement + result.SpeechStyle) / 5;
-                
-                return result;
+
+                return new AudioResult() { Succeeded = true, analysis = result };
             }
             else
             {
-                throw new Exception("Invalid JSON response from server.");
+
+                return new AudioResult() { Succeeded = false, Errors = { "Invalid JSON response from server." } };
             }
         }
 
@@ -132,35 +187,27 @@ namespace PrezUp.Service.Services
 
        
 
-        public async Task<bool> deleteAsync(int id)
+        
+        public async Task<bool> deleteAsync(int id, int userId)
         {
             Presentation itemToDelete = await _repository.Presentations.GetByIdAsync(id);
+            if (itemToDelete == null)
+            {
+                throw new KeyNotFoundException("Presentation not found");
+            }
+
+            // בדיקה שהמשתמש הנוכחי הוא הבעלים של הפרזנטציה
+            if (itemToDelete.UserId != userId)
+            {
+                throw new UnauthorizedAccessException("You are not authorized to delete this presentation");
+            }
+
             _repository.Presentations.DeleteAsync(itemToDelete);
             await _repository.SaveAsync();
             return true;
         }
 
 
+
     }
 }
-
-//public async Task<PresentationDTO> addAsync(PresentationDTO presentationDto)
-//{
-//    var model = _mapper.Map<Presentation>(presentationDto);
-
-//    await _repository.Presentations.AddAsync(model);
-//    await _repository.SaveAsync();
-
-//    return _mapper.Map<PresentationDTO>(model);
-
-//}
-
-//public async Task<PresentationDTO> updateAsync(int id, PresentationDTO presentationDto)
-//{
-//    var model = _mapper.Map<Presentation>(presentationDto);
-
-//    var updated = _repository.Presentations.UpdateAsync(model);
-//    await _repository.SaveAsync();
-//    return _mapper.Map<PresentationDTO>(updated);
-
-//}

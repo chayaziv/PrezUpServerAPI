@@ -30,6 +30,7 @@ namespace PrezUp.Extesion
             s.AddScoped<IAuthService, AuthService>();
             s.AddAutoMapper(typeof(AutoMapperProfile));
             s.AddHttpClient();
+            
             s.AddDbContext<DataContext>(optionsBuilder =>
             {
                 optionsBuilder.UseSqlServer("Data Source = DESKTOP-13C4MS2; Initial Catalog = PrezUp_DB; Integrated Security = true;TrustServerCertificate=True");

@@ -11,9 +11,7 @@ namespace PrezUp.Core.EntityDTO
 
     
     public class UserDTO
-    {      
-        public int Id { get; set; }
-      
+    {       
         public string Name { get; set; } = string.Empty;
       
         public string Email { get; set; } = string.Empty;
@@ -27,7 +25,6 @@ namespace PrezUp.Core.EntityDTO
         public bool CompareWithOthers { get; set; } = true;
         public bool AllowPublicPresentations { get; set; } = false;
            
-        public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
         public string AccountStatus { get; set; } = "Active";
        
     }
