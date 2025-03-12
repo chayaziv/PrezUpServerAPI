@@ -11,5 +11,7 @@ namespace PrezUp.Core.IRepositories
    {
        public Task<List<Presentation>> GetPresentationsByUserIdAsync(int userId);
        public Task<Presentation> SaveAnalysisAsync(AnalysisResult analysisResult,bool isPublic,int userId, string fileUrl);
+       public  Task<List<Presentation>> GetPublicPresentationsAsync();
    }
 }
+;
