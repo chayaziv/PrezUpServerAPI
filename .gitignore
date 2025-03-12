@@ -484,3 +484,4 @@ $RECYCLE.BIN/
 *.swp
 
 .env
+"PrezUp.API/appsettings.json" 
