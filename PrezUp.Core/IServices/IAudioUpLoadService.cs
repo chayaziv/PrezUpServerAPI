@@ -8,6 +8,6 @@ namespace PrezUp.Core.IServices
 {
     public interface IAudioUpLoadService
     {
-        public Task<string> UploadFileToS3Async(string filePath, string objectKey);
+        public Task<string> UploadFileToS3Async(Stream fileStream, string objectKey);
     }
 }

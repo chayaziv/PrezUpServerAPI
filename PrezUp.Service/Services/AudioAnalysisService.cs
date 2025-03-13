@@ -9,7 +9,7 @@ using PrezUp.Core.models;
 
 namespace PrezUp.Service.Services
 {
-    public class AudioAnalysisService:IAudioAnalysisService
+    public class AudioAnalysisService : IAudioAnalysisService
     {
         private readonly IHttpClientFactory _httpClientFactory;
 
@@ -18,15 +18,24 @@ namespace PrezUp.Service.Services
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<AudioResult> AnalyzeAudioAsync(string filePath)
+        public async Task<AudioResult> AnalyzeAudioAsync(string fileUrl)
         {
+            //using var client = _httpClientFactory.CreateClient();
+            //Console.WriteLine("\n\n\n******************************\n\n\n"+fileUrl);
+            //using var fileStream = new FileStream(fileUrl, FileMode.Open, FileAccess.Read, FileShare.Read);
+            //Console.WriteLine(  "\n\n\n##################################\n\n\n");
+            //using var content = new MultipartFormDataContent
+            //{
+            //    { new StreamContent(fileStream), "audio", "temp_audio.wav" }
+            //};
             using var client = _httpClientFactory.CreateClient();
-            using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            using var content = new MultipartFormDataContent
-            {
-                { new StreamContent(fileStream), "audio", "temp_audio.wav" }
-            };
 
+            // הורדת הקובץ מה-URL
+            using var responseStream = await client.GetStreamAsync(fileUrl);
+            using var content = new MultipartFormDataContent
+    {
+        { new StreamContent(responseStream), "audio", "temp_audio.wav" }
+    };
             try
             {
                 var response = await client.PostAsync("http://localhost:5000/analyze-audio", content);

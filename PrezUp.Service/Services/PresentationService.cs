@@ -32,43 +32,63 @@ namespace PrezUp.Service.Services
             _audioAnalysisService = audioAnalysisService;
             _mapper = mapper;
         }
+        //public async Task<AudioResult> AnalyzeAudioAsync(IFormFile audio, bool isPublic, int userId)
+        //{
+        //    var tempFilePath = Path.Combine(Directory.GetCurrentDirectory(), "temp_audio.wav");
+
+        //    using (var stream = new FileStream(tempFilePath, FileMode.Create))
+        //    {
+        //        await audio.CopyToAsync(stream);
+        //    }
+
+        //    string fileUrl = string.Empty;
+        //    try
+        //    {
+        //        fileUrl = await _audioUploadService.UploadFileToS3Async(tempFilePath, "recordings/" + Guid.NewGuid() + ".wav");
+
+        //        var audioResult = await _audioAnalysisService.AnalyzeAudioAsync(tempFilePath);
+
+        //        if (audioResult.Succeeded)
+        //        {
+        //            await _repository.Presentations.SaveAnalysisAsync(audioResult.analysis, isPublic, userId, fileUrl);
+        //            int res = await _repository.SaveAsync();
+
+        //            if (res == 0)
+        //            {
+        //                return new AudioResult { Succeeded = false, Errors = { "errors in save to database" } };
+        //            }
+        //        }
+
+        //        return audioResult;
+        //    }
+        //    finally
+        //    {
+        //        if (File.Exists(tempFilePath))
+        //        {
+        //            File.Delete(tempFilePath);
+        //        }
+        //    }
+        //}
         public async Task<AudioResult> AnalyzeAudioAsync(IFormFile audio, bool isPublic, int userId)
         {
-            var tempFilePath = Path.Combine(Directory.GetCurrentDirectory(), "temp_audio.wav");
-
-            using (var stream = new FileStream(tempFilePath, FileMode.Create))
+            
+            string fileKey = $"recordings/{Guid.NewGuid()}.wav";
+            string fileUrl = await _audioUploadService.UploadFileToS3Async(audio.OpenReadStream(), fileKey);
+           // Console.WriteLine(  "\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+fileUrl+"\n\n");
+            var audioResult = await _audioAnalysisService.AnalyzeAudioAsync(fileUrl);
+       
+            if (audioResult.Succeeded)
             {
-                await audio.CopyToAsync(stream);
-            }
-
-            string fileUrl = string.Empty;
-            try
-            {
-                fileUrl = await _audioUploadService.UploadFileToS3Async(tempFilePath, "recordings/" + Guid.NewGuid() + ".wav");
-
-                var audioResult = await _audioAnalysisService.AnalyzeAudioAsync(tempFilePath);
-
-                if (audioResult.Succeeded)
+                await _repository.Presentations.SaveAnalysisAsync(audioResult.analysis, isPublic, userId, fileUrl);
+                if (await _repository.SaveAsync() == 0)
                 {
-                    await _repository.Presentations.SaveAnalysisAsync(audioResult.analysis, isPublic, userId, fileUrl);
-                    int res = await _repository.SaveAsync();
-
-                    if (res == 0)
-                    {
-                        return new AudioResult { Succeeded = false, Errors = { "errors in save to database" } };
-                    }
-                }
-
-                return audioResult;
-            }
-            finally
-            {
-                if (File.Exists(tempFilePath))
-                {
-                    File.Delete(tempFilePath);
+                    return new AudioResult { Succeeded = false, Errors = { "Error saving to database" } };
                 }
             }
+
+            return audioResult;
         }
+
 
         public async Task<List<PresentationDTO>> getallAsync()
         {
