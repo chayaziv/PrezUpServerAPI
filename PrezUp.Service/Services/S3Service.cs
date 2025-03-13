@@ -8,10 +8,11 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using PrezUp.Core.IServices;
+using PrezUp.Core.Utils;
 
 namespace PrezUp.Service.Services
 {
-    public class AudioUploadService : IAudioUpLoadService
+    public class AudioUploadService : Is3Service
     {
         private readonly IConfiguration _configuration;
         private readonly string _bucketName;
@@ -33,23 +34,33 @@ namespace PrezUp.Service.Services
             }
         }
 
-        public async Task<string> UploadFileToS3Async(Stream fileStream, string objectKey)
+        public async Task<Result<S3Data>> UploadFileToS3Async(Stream fileStream, string objectKey)
         {
-            using var s3Client = new AmazonS3Client(_accessKey, _secretKey, _region);
-            var uploadRequest = new TransferUtilityUploadRequest
+            try
             {
-                InputStream = fileStream,
-                BucketName = _bucketName,
-                Key = objectKey,
-                ContentType = "audio/wav"
-            };
+                using var s3Client = new AmazonS3Client(_accessKey, _secretKey, _region);
+                var uploadRequest = new TransferUtilityUploadRequest
+                {
+                    InputStream = fileStream,
+                    BucketName = _bucketName,
+                    Key = objectKey,
+                    ContentType = "audio/wav"
+                };
 
-            var fileTransferUtility = new TransferUtility(s3Client);
-            await fileTransferUtility.UploadAsync(uploadRequest);
-            return $"https://{_bucketName}.s3.amazonaws.com/{objectKey}";
+                var fileTransferUtility = new TransferUtility(s3Client);
+                await fileTransferUtility.UploadAsync(uploadRequest);
+
+                return Result<S3Data>.Success(new S3Data() { Url = $"https://{_bucketName}.s3.amazonaws.com/{objectKey}" });
+            }
+            catch (Exception ex)
+            {
+
+                return Result<S3Data>.BadRequest($"Error deleting file from S3: {ex.Message}");
+            }
+
         }
 
-        public async Task<bool> DeleteFileFromS3Async(string fileUrl)
+        public async Task<Result<S3Data>> DeleteFileFromS3Async(string fileUrl)
         {
             try
             {
@@ -58,7 +69,7 @@ namespace PrezUp.Service.Services
                     throw new ArgumentException("Invalid file URL.");
                 }
 
-                // חילוץ המפתח (Key) של הקובץ מתוך ה-URL
+               
                 Uri uri = new Uri(fileUrl);
                 string objectKey = uri.AbsolutePath.TrimStart('/');
 
@@ -70,12 +81,12 @@ namespace PrezUp.Service.Services
                 };
 
                 await s3Client.DeleteObjectAsync(deleteObjectRequest);
-                return true;
+                return Result<S3Data>.SuccessNoContent();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error deleting file from S3: {ex.Message}");
-                return false;
+              
+                return Result<S3Data>.BadRequest($"Error deleting file from S3: {ex.Message}");
             }
         }
     }

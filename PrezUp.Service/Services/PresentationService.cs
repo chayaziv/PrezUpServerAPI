@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -10,6 +11,7 @@ using PrezUp.Core.EntityDTO;
 using PrezUp.Core.IRepositories;
 using PrezUp.Core.IServices;
 using PrezUp.Core.models;
+using PrezUp.Core.Utils;
 
 namespace PrezUp.Service.Services
 {
@@ -17,14 +19,14 @@ namespace PrezUp.Service.Services
     {
 
         private readonly IRepositoryManager _repository;
-        private readonly IAudioUpLoadService _audioUploadService;
-        private readonly IAudioAnalysisService _audioAnalysisService;
+        private readonly Is3Service _audioUploadService;
+        private readonly IAnalysisService _audioAnalysisService;
         readonly IMapper _mapper;
 
         public PresentationService(
             IRepositoryManager repository,
-            IAudioUpLoadService audioUploadService,
-            IAudioAnalysisService audioAnalysisService,
+            Is3Service audioUploadService,
+            IAnalysisService audioAnalysisService,
             IMapper mapper)
         {
             _repository = repository;
@@ -32,28 +34,34 @@ namespace PrezUp.Service.Services
             _audioAnalysisService = audioAnalysisService;
             _mapper = mapper;
         }   
-        public async Task<AudioResult> AnalyzeAudioAsync(IFormFile audio, bool isPublic, int userId)
+        public async Task<Result<PresentationDTO>> AnalyzeAudioAsync(IFormFile audio, bool isPublic, int userId)
         {
             
             string fileKey = $"recordings/{Guid.NewGuid()}.wav";
-            string fileUrl = await _audioUploadService.UploadFileToS3Async(audio.OpenReadStream(), fileKey);
-            var audioResult = await _audioAnalysisService.AnalyzeAudioAsync(fileUrl);
-       
-            if (audioResult.Succeeded)
+            var S3Result = await _audioUploadService.UploadFileToS3Async(audio.OpenReadStream(), fileKey);
+            if(!S3Result.IsSuccess)
             {
-                audioResult.analysis.FileUrl = fileUrl;
-                audioResult.analysis.IsPublic = isPublic;
-                audioResult.analysis.UserId = userId;
-                var model = _mapper.Map<Presentation>(audioResult.analysis);
-                 await _repository.Presentations.AddAsync(model);
-                if (await _repository.SaveAsync() == 0)
-                {
-                    return new AudioResult { Succeeded = false, Errors = { "Error saving to database" } };
-                }
-                audioResult.analysis = _mapper.Map<PresentationDTO>(model);
+                return Result<PresentationDTO>.Failure(S3Result.ErrorMessage);
             }
+            var fileUrl = S3Result.Data.Url;
+            var NLPResult = await _audioAnalysisService.AnalyzeAudioAsync(fileUrl);
+            if (!NLPResult.IsSuccess)
+            {
+                return Result<PresentationDTO>.Failure(S3Result.ErrorMessage);
+            }
+            
+            Presentation presentation = _mapper.Map<Presentation>(NLPResult.Data);
+           
+            presentation.IsPublic = isPublic;
+            presentation.FileUrl = fileUrl;
+            presentation.UserId = userId;
+            await _repository.Presentations.AddAsync(presentation);
+            if (await _repository.SaveAsync() == 0)
+            {
+                return Result<PresentationDTO>.Failure("Error in saving to DB");
+            }
+            return Result<PresentationDTO>.Success(_mapper.Map<PresentationDTO>(presentation));
 
-            return audioResult;
         }
 
 

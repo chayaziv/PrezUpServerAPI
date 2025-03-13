@@ -3,9 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PrezUp.Core.Entity;
+using PrezUp.Core.EntityDTO;
 
 namespace PrezUp.Core.Utils
+
+
 {
+    public class AuthData
+    {
+
+        public string Token { get; set; }
+
+        public UserDTO User { get; set; }
+    }
+
+    public class S3Data
+    
+    {
+        public string Url { get; set; }
+    }
+
+    //public class NLPData
+    //{
+    //    public Analysis analysis { get; set; }
+
+    //}
+
+
+
     public class Result<T>
     {
         public bool IsSuccess { get; set; }
@@ -23,8 +49,16 @@ namespace PrezUp.Core.Utils
                 StatusCode = 200 
             };
         }
+        public static Result<T> SuccessNoContent()
+        {
+            return new Result<T>
+            {
+                IsSuccess = true,
+                StatusCode = 201
+            };
+        }
 
-      
+
         public static Result<T> Failure(string errorMessage, int statusCode = 400)
         {
             return new Result<T>

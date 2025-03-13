@@ -10,7 +10,8 @@ namespace PrezUp.Core
         public AutoMapperProfile()
         {
             CreateMap<Presentation, PresentationDTO>().ReverseMap();
-            CreateMap<User, UserDTO>().ReverseMap();       
+            CreateMap<User, UserDTO>().ReverseMap();
+            CreateMap<Analysis, Presentation>();
         }
     }
 }

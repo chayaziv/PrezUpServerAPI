@@ -23,13 +23,10 @@ namespace PrezUp.API.Controllers
 
             if (!result.IsSuccess)
             {
-                //Console.WriteLine(result.Errors.First());
-                //return BadRequest(new { result.Errors });
+
                 return StatusCode(result.StatusCode, new{ messege =result.ErrorMessage});
             }
 
-
-            // return Ok(new { result.Token, Message = "User registered successfully.", user = result.User });
             return StatusCode(result.StatusCode, new { data = result.Data, messege = "User registered successfully" });
         }
 

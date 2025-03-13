@@ -7,20 +7,21 @@ using PrezUp.Core.Entity;
 using PrezUp.Core.EntityDTO;
 using PrezUp.Core.IServices;
 using PrezUp.Core.models;
+using PrezUp.Core.Utils;
 
 namespace PrezUp.Service.Services
 {
-    public class AudioAnalysisService : IAudioAnalysisService
+    public class AnalysisService : IAnalysisService
     {
         private readonly IHttpClientFactory _httpClientFactory;
         
 
-        public AudioAnalysisService(IHttpClientFactory httpClientFactory)
+        public AnalysisService(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<AudioResult> AnalyzeAudioAsync(string fileUrl)
+        public async Task<Result<Analysis>> AnalyzeAudioAsync(string fileUrl)
         {
            
             using var client = _httpClientFactory.CreateClient();
@@ -37,24 +38,27 @@ namespace PrezUp.Service.Services
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    return new AudioResult { Succeeded = false, Errors = { "errors in NLP server, failed to analyze audio" } };
+                 
+                    return Result<Analysis>.Failure("failed to analyze audio ");
                 }
 
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var cleanedContent = responseContent.Replace("```json", "").Replace("```", "").Trim();
                 JObject jsonObject = JObject.Parse(cleanedContent);
 
-                return ParseAnalysisResult(jsonObject);
+                var analysis= ParseAnalysisResult(jsonObject);
+                return Result<Analysis>.Success( analysis);
             }
             catch (Exception e)
             {
-                return new AudioResult { Succeeded = false, Errors = { e.Message } };
+              
+                return Result<Analysis>.Failure($"Error {e.Message}");
             }
         }
 
-        private AudioResult ParseAnalysisResult(JObject jsonObject)
+        private Analysis ParseAnalysisResult(JObject jsonObject)
         {
-            var result = new PresentationDTO
+            var analysis = new Analysis
             {
                 Clarity = (int?)jsonObject["scores"]["clarity"]["score"] ?? 0,
                 ClarityFeedback = (string)jsonObject["scores"]["clarity"]["reason"],
@@ -69,9 +73,9 @@ namespace PrezUp.Service.Services
                 Tips = (string)jsonObject["tips"]
             };
 
-            result.Score = (result.Clarity + result.Fluency + result.Confidence + result.Engagement + result.SpeechStyle) / 5;
-            
-            return new AudioResult { Succeeded = true, analysis = result };
+            analysis.Score = (analysis.Clarity + analysis.Fluency + analysis.Confidence + analysis.Engagement + analysis.SpeechStyle) / 5;
+
+            return analysis;
         }
     }
 }

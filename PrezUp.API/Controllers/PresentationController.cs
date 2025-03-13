@@ -38,7 +38,7 @@ namespace PrezUp.API.Controllers
             try
             {
 
-                // קבלת ה-UserId מתוך ה-JWT
+             
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim == null)
                 {
@@ -47,15 +47,16 @@ namespace PrezUp.API.Controllers
 
                 int userId = int.Parse(userIdClaim.Value);
                
-                // שליחת userId ל-Service
-                var analysisResult = await _presentationService.AnalyzeAudioAsync(audio, isPublic, userId);
-                if(analysisResult.Succeeded)
+           
+                var result  = await _presentationService.AnalyzeAudioAsync(audio, isPublic, userId);
+                if(result.IsSuccess)
                 {
-                    return Ok(new { message = "Audio analyzed successfully", data = analysisResult.analysis });
+                  
+                    return StatusCode(result.StatusCode, new { data = result.Data ,messege= "Audio analyzed successfully" });
                 }
                 else
                 {
-                    return StatusCode(500, analysisResult.Errors);
+                    return StatusCode(result.StatusCode, new {messege=result.ErrorMessage});
                 }
                                 
             }

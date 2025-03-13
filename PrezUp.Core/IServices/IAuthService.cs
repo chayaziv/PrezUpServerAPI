@@ -11,7 +11,7 @@ namespace PrezUp.Core.IServices
     public interface IAuthService
     {
 
-        Task<Result<AuthType>> RegisterUserAsync(RegisterModel model);
-        Task<Result<AuthType>> LoginAsync(LoginModel model);
+        Task<Result<AuthData>> RegisterUserAsync(RegisterModel model);
+        Task<Result<AuthData>> LoginAsync(LoginModel model);
     }
 }
