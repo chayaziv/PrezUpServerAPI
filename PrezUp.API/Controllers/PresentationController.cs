@@ -85,6 +85,7 @@ namespace PrezUp.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeletePresentation(int id)
         {
             try

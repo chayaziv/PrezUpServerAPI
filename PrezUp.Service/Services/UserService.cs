@@ -50,13 +50,35 @@ namespace PrezUp.Service.Services
             return _mapper.Map<UserDTO>(updated);
         }
 
+        //public async Task<bool> DeleteAsync(int id)
+        //{
+        //    User itemToDelete = await _repository.Users.GetByIdAsync(id);
+        //    _repository.Users.DeleteAsync(itemToDelete);
+        //    await _repository.SaveAsync();
+        //    return true;
+        //}
         public async Task<bool> DeleteAsync(int id)
         {
-            User itemToDelete = await _repository.Users.GetByIdAsync(id);
-            _repository.Users.DeleteAsync(itemToDelete);
+            var user = await _repository.Users.GetByIdAsync(id);
+            if (user == null)
+                return false;
+
+            // מחיקת כל הפרזנטציות של המשתמש
+            var presentations = await _repository.Presentations.GetPresentationsByUserIdAsync(id);
+            foreach (var presentation in presentations)
+            {
+                _repository.Presentations.DeleteAsync(presentation);
+            }
+
+            // מחיקת המשתמש עצמו
+            _repository.Users.DeleteAsync(user);
+
+            // שמירת השינויים
             await _repository.SaveAsync();
+
             return true;
         }
+
         public async Task<List<PresentationDTO>> GetPresentationsByUserIdAsync(int userId)
         {
             var presentations=  await _repository.Presentations.GetPresentationsByUserIdAsync(userId);

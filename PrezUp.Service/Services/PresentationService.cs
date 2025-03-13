@@ -31,50 +31,12 @@ namespace PrezUp.Service.Services
             _audioUploadService = audioUploadService;
             _audioAnalysisService = audioAnalysisService;
             _mapper = mapper;
-        }
-        //public async Task<AudioResult> AnalyzeAudioAsync(IFormFile audio, bool isPublic, int userId)
-        //{
-        //    var tempFilePath = Path.Combine(Directory.GetCurrentDirectory(), "temp_audio.wav");
-
-        //    using (var stream = new FileStream(tempFilePath, FileMode.Create))
-        //    {
-        //        await audio.CopyToAsync(stream);
-        //    }
-
-        //    string fileUrl = string.Empty;
-        //    try
-        //    {
-        //        fileUrl = await _audioUploadService.UploadFileToS3Async(tempFilePath, "recordings/" + Guid.NewGuid() + ".wav");
-
-        //        var audioResult = await _audioAnalysisService.AnalyzeAudioAsync(tempFilePath);
-
-        //        if (audioResult.Succeeded)
-        //        {
-        //            await _repository.Presentations.SaveAnalysisAsync(audioResult.analysis, isPublic, userId, fileUrl);
-        //            int res = await _repository.SaveAsync();
-
-        //            if (res == 0)
-        //            {
-        //                return new AudioResult { Succeeded = false, Errors = { "errors in save to database" } };
-        //            }
-        //        }
-
-        //        return audioResult;
-        //    }
-        //    finally
-        //    {
-        //        if (File.Exists(tempFilePath))
-        //        {
-        //            File.Delete(tempFilePath);
-        //        }
-        //    }
-        //}
+        }   
         public async Task<AudioResult> AnalyzeAudioAsync(IFormFile audio, bool isPublic, int userId)
         {
             
             string fileKey = $"recordings/{Guid.NewGuid()}.wav";
             string fileUrl = await _audioUploadService.UploadFileToS3Async(audio.OpenReadStream(), fileKey);
-           // Console.WriteLine(  "\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+fileUrl+"\n\n");
             var audioResult = await _audioAnalysisService.AnalyzeAudioAsync(fileUrl);
        
             if (audioResult.Succeeded)
@@ -116,23 +78,31 @@ namespace PrezUp.Service.Services
             }
             return listDTOs;
         }
+       
         public async Task<bool> deleteAsync(int id, int userId)
         {
-            Presentation itemToDelete = await _repository.Presentations.GetByIdAsync(id);
+            var itemToDelete = await _repository.Presentations.GetByIdAsync(id);
             if (itemToDelete == null)
             {
                 throw new KeyNotFoundException("Presentation not found");
             }
-
 
             if (itemToDelete.UserId != userId)
             {
                 throw new UnauthorizedAccessException("You are not authorized to delete this presentation");
             }
 
+          
+            if (!string.IsNullOrEmpty(itemToDelete.FileUrl))
+            {
+                await _audioUploadService.DeleteFileFromS3Async(itemToDelete.FileUrl);
+            }
+
+           
             _repository.Presentations.DeleteAsync(itemToDelete);
-            await _repository.SaveAsync();
+              await _repository.SaveAsync();
             return true;
         }
+
     }
 }
