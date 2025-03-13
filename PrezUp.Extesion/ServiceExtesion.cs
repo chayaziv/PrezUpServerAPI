@@ -16,7 +16,7 @@ using PrezUp.Service.Services;
 
 namespace PrezUp.Extesion
 {
-     public static class ExtesionServiceCollection
+     public static class ServiceExtesion
     {
         public static void ServieDependencyInjector(this IServiceCollection s, IConfiguration configuration)
         {

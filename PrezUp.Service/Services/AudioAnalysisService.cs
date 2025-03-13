@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using PrezUp.Core.Entity;
+using PrezUp.Core.EntityDTO;
 using PrezUp.Core.IServices;
 using PrezUp.Core.models;
 
@@ -12,6 +13,7 @@ namespace PrezUp.Service.Services
     public class AudioAnalysisService : IAudioAnalysisService
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        
 
         public AudioAnalysisService(IHttpClientFactory httpClientFactory)
         {
@@ -52,7 +54,7 @@ namespace PrezUp.Service.Services
 
         private AudioResult ParseAnalysisResult(JObject jsonObject)
         {
-            var result = new AnalysisResult
+            var result = new PresentationDTO
             {
                 Clarity = (int?)jsonObject["scores"]["clarity"]["score"] ?? 0,
                 ClarityFeedback = (string)jsonObject["scores"]["clarity"]["reason"],
@@ -68,6 +70,7 @@ namespace PrezUp.Service.Services
             };
 
             result.Score = (result.Clarity + result.Fluency + result.Confidence + result.Engagement + result.SpeechStyle) / 5;
+            
             return new AudioResult { Succeeded = true, analysis = result };
         }
     }

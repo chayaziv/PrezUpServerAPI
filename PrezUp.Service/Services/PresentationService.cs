@@ -41,11 +41,16 @@ namespace PrezUp.Service.Services
        
             if (audioResult.Succeeded)
             {
-                await _repository.Presentations.SaveAnalysisAsync(audioResult.analysis, isPublic, userId, fileUrl);
+                audioResult.analysis.FileUrl = fileUrl;
+                audioResult.analysis.IsPublic = isPublic;
+                audioResult.analysis.UserId = userId;
+                var model = _mapper.Map<Presentation>(audioResult.analysis);
+                 await _repository.Presentations.AddAsync(model);
                 if (await _repository.SaveAsync() == 0)
                 {
                     return new AudioResult { Succeeded = false, Errors = { "Error saving to database" } };
                 }
+                audioResult.analysis = _mapper.Map<PresentationDTO>(model);
             }
 
             return audioResult;

@@ -5,14 +5,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PrezUp.Core.Entity;
 
 namespace PrezUp.Core.EntityDTO
 {
    
     public class PresentationDTO
     {
-        public int Id { get; set; }    
-        public string FileUrl { get; set; } = string.Empty;
+
+       
+        public string? FileUrl { get; set; } = string.Empty;
         public int Clarity { get; set; }
         public string ClarityFeedback { get; set; }
         public int Fluency { get; set; }
@@ -28,7 +30,11 @@ namespace PrezUp.Core.EntityDTO
         public int Score { get; set; }
         public string Tips { get; set; }
 
-        
+        public bool IsPublic { get; set; }
+      
+        public int UserId { get; set; }
+       
+
 
     }
 }
