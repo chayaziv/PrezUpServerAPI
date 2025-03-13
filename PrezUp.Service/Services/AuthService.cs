@@ -14,6 +14,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using AutoMapper;
 using PrezUp.Core.EntityDTO;
+using PrezUp.Core.Utils;
 
 namespace PrezUp.Service.Services
 {
@@ -30,12 +31,14 @@ namespace PrezUp.Service.Services
             _configuration = configuration;
             _mapper = mapper;
         }
-
-        public async Task<AuthResult> RegisterUserAsync(RegisterModel model)
+        //return new AuthResult { Succeeded = false, Errors = new List<string> { "Email already exists" } };
+        public async Task<Result<AuthType>> RegisterUserAsync(RegisterModel model)
         {
             if (await _repository.Users.ExistsByEmailAsync(model.Email))
             {
-                return new AuthResult { Succeeded = false, Errors = new List<string> { "Email already exists" } };
+
+                return Result<AuthType>.BadRequest("Email already exists");
+
             }
 
             var newUser = new User
@@ -49,20 +52,23 @@ namespace PrezUp.Service.Services
             await _repository.SaveAsync();
             var userDto = _mapper.Map<UserDTO>(newUser);
             var token = GenerateJwtToken(newUser);
-            return new AuthResult { Succeeded = true, Token = token , User=userDto};
+            //return new AuthResult { Succeeded = true, Token = token , User=userDto};
+            return Result<AuthType>.Success(new AuthType() { Token = token, User = userDto });
         }
 
 
-        public async Task<AuthResult> LoginAsync(LoginModel model)
+        public async Task<Result<AuthType>> LoginAsync(LoginModel model)
         {
             var existUser = await _repository.Users.GetByEmailAsync(model.Email);
             if (existUser == null || !BCrypt.Net.BCrypt.Verify(model.Password, existUser.PasswordHash))
             {
-                return new AuthResult { Succeeded = false, Errors = new List<string> { "Invalid email or password" } };
+                //return new AuthResult { Succeeded = false, Errors = new List<string> { "Invalid email or password" } };
+                return Result<AuthType>.BadRequest("Invalid email or password");
             }
             var userDto = _mapper.Map<UserDTO>(existUser);
             var token = GenerateJwtToken(existUser);
-            return new AuthResult { Succeeded = true, Token = token, User = userDto };
+           // return new AuthResult { Succeeded = true, Token = token, User = userDto };
+            return Result<AuthType>.Success(new AuthType() { Token = token, User = userDto });
         }
 
 

@@ -21,14 +21,16 @@ namespace PrezUp.API.Controllers
         {
             var result = await _authService.RegisterUserAsync(model);
 
-            if (!result.Succeeded)
+            if (!result.IsSuccess)
             {
-                Console.WriteLine(result.Errors.First());
-                return BadRequest(new { result.Errors });
+                //Console.WriteLine(result.Errors.First());
+                //return BadRequest(new { result.Errors });
+                return StatusCode(result.StatusCode, new{ messege =result.ErrorMessage});
             }
 
 
-            return Ok(new { result.Token, Message = "User registered successfully.", user = result.User });
+            // return Ok(new { result.Token, Message = "User registered successfully.", user = result.User });
+            return StatusCode(result.StatusCode, new { data = result.Data, messege = "User registered successfully" });
         }
 
 
@@ -37,10 +39,10 @@ namespace PrezUp.API.Controllers
         {
             var result = await _authService.LoginAsync(model);
 
-            if (!result.Succeeded)
-                return Unauthorized(new { result.Errors });
+            if (!result.IsSuccess)
+                return StatusCode(result.StatusCode, new { messege = result.ErrorMessage });
 
-            return Ok(new { result.Token, Message = "Login successful.", user = result.User });
+            return StatusCode(result.StatusCode, new { data = result.Data, messege = "User logined successfully" });
         }
     }
 }

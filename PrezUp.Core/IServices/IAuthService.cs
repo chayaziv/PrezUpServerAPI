@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PrezUp.Core.models;
+using PrezUp.Core.Utils;
 
 namespace PrezUp.Core.IServices
 {
     public interface IAuthService
     {
 
-        Task<AuthResult> RegisterUserAsync(RegisterModel model);
-        Task<AuthResult> LoginAsync(LoginModel model);
+        Task<Result<AuthType>> RegisterUserAsync(RegisterModel model);
+        Task<Result<AuthType>> LoginAsync(LoginModel model);
     }
 }
