@@ -1,62 +1,25 @@
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using PrezUp.API;
 using PrezUp.Extesion;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-// הגדרת JWT Authentication
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"]
-        };
-    });
-
-
-
+builder.Services.AddAuthenticationServices(builder.Configuration);
 builder.Services.ServieDependencyInjector(builder.Configuration);
-builder.Services.AddAutoMapper(typeof(MappingPostEntity));
-builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
-
-builder.Services.AddOpenApi();
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll",
-        policy =>
-        {
-            policy.AllowAnyOrigin()
-                  .AllowAnyMethod()
-                  .AllowAnyHeader();
-        });
-});
-
+builder.Services.AddCorsPolicy();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-   
+    app.UseSwaggerUI();
 }
 
 app.UseCors("AllowAll");
-
 
 app.UseAuthentication();
 app.UseAuthorization();

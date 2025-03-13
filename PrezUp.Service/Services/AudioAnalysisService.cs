@@ -20,17 +20,10 @@ namespace PrezUp.Service.Services
 
         public async Task<AudioResult> AnalyzeAudioAsync(string fileUrl)
         {
-            //using var client = _httpClientFactory.CreateClient();
-            //Console.WriteLine("\n\n\n******************************\n\n\n"+fileUrl);
-            //using var fileStream = new FileStream(fileUrl, FileMode.Open, FileAccess.Read, FileShare.Read);
-            //Console.WriteLine(  "\n\n\n##################################\n\n\n");
-            //using var content = new MultipartFormDataContent
-            //{
-            //    { new StreamContent(fileStream), "audio", "temp_audio.wav" }
-            //};
+           
             using var client = _httpClientFactory.CreateClient();
 
-            // הורדת הקובץ מה-URL
+          
             using var responseStream = await client.GetStreamAsync(fileUrl);
             using var content = new MultipartFormDataContent
     {
