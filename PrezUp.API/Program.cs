@@ -11,6 +11,8 @@ builder.Services.AddControllers();
 builder.Services.AddAuthenticationServices(builder.Configuration);
 builder.Services.ServieDependencyInjector(builder.Configuration);
 builder.Services.AddCorsPolicy();
+builder.Services.AddAutoMapper(typeof(MappingPostEntity));
+
 
 var app = builder.Build();
 

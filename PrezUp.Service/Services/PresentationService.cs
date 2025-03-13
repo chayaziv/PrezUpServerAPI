@@ -63,59 +63,52 @@ namespace PrezUp.Service.Services
             return Result<PresentationDTO>.Success(_mapper.Map<PresentationDTO>(presentation));
 
         }
-
-
-        public async Task<List<PresentationDTO>> getallAsync()
+        public async Task<Result<List<PresentationDTO>>> getallAsync()
         {
             var list = await _repository.Presentations.GetListAsync();
-            var listDTOs = new List<PresentationDTO>();
-            foreach (var item in list)
-            {
-                listDTOs.Add(_mapper.Map<PresentationDTO>(item));
-            }
-            return listDTOs;
+            var listDTOs = list.Select(item => _mapper.Map<PresentationDTO>(item)).ToList();
+            return Result<List<PresentationDTO>>.Success(listDTOs);
         }
-        public async Task<PresentationDTO> getByIdAsync(int id)
+
+        public async Task<Result<PresentationDTO>> getByIdAsync(int id)
         {
             var item = await _repository.Presentations.GetByIdAsync(id);
-
-            return _mapper.Map<PresentationDTO>(item);
+            if (item == null)
+                return Result<PresentationDTO>.NotFound("Presentation not found");
+            return Result<PresentationDTO>.Success(_mapper.Map<PresentationDTO>(item));
         }
-        public async Task<List<PresentationDTO>> GetPublicPresentationsAsync()
+
+        public async Task<Result<List<PresentationDTO>>> GetPublicPresentationsAsync()
         {
             var list = await _repository.Presentations.GetPublicPresentationsAsync();
-            var listDTOs = new List<PresentationDTO>();
-            foreach (var item in list)
-            {
-                listDTOs.Add(_mapper.Map<PresentationDTO>(item));
-            }
-            return listDTOs;
+            var listDTOs = list.Select(item => _mapper.Map<PresentationDTO>(item)).ToList();
+            return Result<List<PresentationDTO>>.Success(listDTOs);
         }
-       
-        public async Task<bool> deleteAsync(int id, int userId)
+
+        public async Task<Result<bool>> deleteAsync(int id, int userId)
         {
             var itemToDelete = await _repository.Presentations.GetByIdAsync(id);
             if (itemToDelete == null)
             {
-                throw new KeyNotFoundException("Presentation not found");
+                return Result<bool>.NotFound("Presentation not found");
             }
 
             if (itemToDelete.UserId != userId)
             {
-                throw new UnauthorizedAccessException("You are not authorized to delete this presentation");
+                return Result<bool>.Unauthorized("You are not authorized to delete this presentation");
             }
 
-          
             if (!string.IsNullOrEmpty(itemToDelete.FileUrl))
             {
                 await _audioUploadService.DeleteFileFromS3Async(itemToDelete.FileUrl);
             }
 
-           
             _repository.Presentations.DeleteAsync(itemToDelete);
-              await _repository.SaveAsync();
-            return true;
+            await _repository.SaveAsync();
+            return Result<bool>.Success(true);
         }
 
     }
+
 }
+

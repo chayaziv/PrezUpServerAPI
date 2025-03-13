@@ -2,18 +2,20 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using PrezUp.API.PostEntity;
 using PrezUp.Core.Entity;
 using PrezUp.Core.EntityDTO;
 using PrezUp.Core.IServices;
+using PrezUp.Core.Utils;
 using PrezUp.Service.Services;
 
 namespace PrezUp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -28,50 +30,61 @@ namespace PrezUp.API.Controllers
         [HttpGet]      
         public async Task<ActionResult<List<UserDTO>>> Get()
         {
-            var users= await _userService.GetAllAsync();
-            if (users == null)
+            var result= await _userService.GetAllAsync();
+            if (!result.IsSuccess)
             {
-                return NotFound("no users found");
+                return StatusCode(result.StatusCode, new { messege = result.ErrorMessage });
             }
-            return Ok(users);
+            return StatusCode(result.StatusCode, new { data = result.Data });
         }
 
         [HttpGet("{id}")]
         
         public async Task<ActionResult<UserDTO>> Get(int id)
         {
-            var user = await _userService.GetByIdAsync(id);
-            if (user == null)
-                return NotFound();
-            return Ok(user);
+            var result = await _userService.GetByIdAsync(id);
+            if (!result.IsSuccess)
+            {
+                return StatusCode(result.StatusCode, new { messege = result.ErrorMessage });
+            }
+            return StatusCode(result.StatusCode, new { data = result.Data });
         }
 
         [HttpPost]
         public async Task<ActionResult<UserDTO>> Post([FromBody] UserPost user)
         {
+           
             var dto= _mapper.Map<UserDTO>(user);
-            var userAdd = await _userService.AddAsync(dto);
-            if (userAdd != null)
-                return Ok(userAdd);
-            return BadRequest(userAdd);
+           
+            var result = await _userService.AddAsync(dto);
+            if (!result.IsSuccess)
+            {
+                return StatusCode(result.StatusCode, new { messege = result.ErrorMessage });
+            }
+            return StatusCode(result.StatusCode, new { data = result.Data });
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<UserDTO>> Put(int id, [FromBody] UserPost user)
         {
             var dto = _mapper.Map<UserDTO>(user);
-            var userUpdate = await _userService.UpdateAsync(id, dto);
-            if (userUpdate != null)
-                return Ok(userUpdate);
-            return NotFound(userUpdate);
+            var result = await _userService.UpdateAsync(id, dto);
+            if (!result.IsSuccess)
+            {
+                return StatusCode(result.StatusCode, new { messege = result.ErrorMessage });
+            }
+            return StatusCode(result.StatusCode, new { data = result.Data });
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            if (!await _userService.DeleteAsync(id))
-                return NotFound();
-            return Ok();
+            var result = await _userService.DeleteAsync(id);
+            if (!result.IsSuccess)
+            {
+                return StatusCode(result.StatusCode, new { messege = result.ErrorMessage });
+            }
+            return StatusCode(result.StatusCode);
         }
         
         
@@ -90,14 +103,13 @@ namespace PrezUp.API.Controllers
                 return BadRequest("Invalid user ID in token.");
             }
 
-            var presentations = await _userService.GetPresentationsByUserIdAsync(userId);
+            var result = await _userService.GetPresentationsByUserIdAsync(userId);
 
-            if (presentations == null || presentations.Count == 0)
+            if (!result.IsSuccess)
             {
-                return NotFound("No presentations found for this user.");
+                return StatusCode(result.StatusCode, new { messege = result.ErrorMessage });
             }
-
-            return Ok(presentations);
+            return StatusCode(result.StatusCode, new { data = result.Data });
         }
 
 

@@ -25,7 +25,7 @@ namespace PrezUp.API.PostEntity
         public bool CompareWithOthers { get; set; } = true;
         public bool AllowPublicPresentations { get; set; } = false;
            
-        public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
+        
         public string AccountStatus { get; set; } = "Active";
        
     }

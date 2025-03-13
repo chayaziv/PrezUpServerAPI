@@ -66,49 +66,87 @@ namespace PrezUp.API.Controllers
             }
         }
         [HttpGet]
-        public async Task<ActionResult<List<PresentationDTO>>> Get()
+        public async Task<IActionResult> Get()
         {
-            return await _presentationService.getallAsync();
+            var result = await _presentationService.getallAsync();
+            if (!result.IsSuccess)
+                return StatusCode(result.StatusCode, new { message = result.ErrorMessage });
+           
+            return StatusCode(result.StatusCode, new { data = result.Data });
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PresentationDTO>> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            if (await _presentationService.getByIdAsync(id) == null)
-                return NotFound();
-            return Ok(_presentationService.getByIdAsync(id));
+            var result = await _presentationService.getByIdAsync(id);
+            if (!result.IsSuccess)
+                return StatusCode(result.StatusCode, new { message = result.ErrorMessage });
+            return StatusCode(result.StatusCode, new { data = result.Data });
         }
+
         [HttpGet("public")]
-        public async Task<ActionResult<List<PresentationDTO>>> GetPublicPresentations()
+        public async Task<IActionResult> GetPublicPresentations()
         {
-            var presentations = await _presentationService.GetPublicPresentationsAsync();
-            return Ok(presentations);
+            var result = await _presentationService.GetPublicPresentationsAsync();
+            if (!result.IsSuccess)
+                return StatusCode(result.StatusCode, new { message = result.ErrorMessage });
+            return StatusCode(result.StatusCode, new { data = result.Data });
         }
 
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> DeletePresentation(int id)
         {
-            try
-            {
-                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-                await _presentationService.deleteAsync(id, userId);
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return StatusCode(404, new { message = ex.Message });
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var result = await _presentationService.deleteAsync(id, userId);
+            if (!result.IsSuccess)
+                return StatusCode(result.StatusCode, new { message = result.ErrorMessage });
+            return NoContent();
+        }
+        //[HttpGet]
+        //public async Task<ActionResult<List<PresentationDTO>>> Get()
+        //{
+        //    return await _presentationService.getallAsync();
+        //}
 
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return StatusCode(403, new { message = ex.Message });
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<PresentationDTO>> Get(int id)
+        //{
+        //    if (await _presentationService.getByIdAsync(id) == null)
+        //        return NotFound();
+        //    return Ok(_presentationService.getByIdAsync(id));
+        //}
+        //[HttpGet("public")]
+        //public async Task<ActionResult<List<PresentationDTO>>> GetPublicPresentations()
+        //{
+        //    var presentations = await _presentationService.GetPublicPresentationsAsync();
+        //    return Ok(presentations);
+        //}
 
-            }
-            catch (Exception )
-            {
-                return StatusCode(500, new { message = "An unexpected error occurred" });
-            }
-        }     
+        //[HttpDelete("{id}")]
+        //[Authorize]
+        //public async Task<IActionResult> DeletePresentation(int id)
+        //{
+        //    try
+        //    {
+        //        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+        //        await _presentationService.deleteAsync(id, userId);
+        //        return NoContent();
+        //    }
+        //    catch (KeyNotFoundException ex)
+        //    {
+        //        return StatusCode(404, new { message = ex.Message });
+
+        //    }
+        //    catch (UnauthorizedAccessException ex)
+        //    {
+        //        return StatusCode(403, new { message = ex.Message });
+
+        //    }
+        //    catch (Exception )
+        //    {
+        //        return StatusCode(500, new { message = "An unexpected error occurred" });
+        //    }
+        //}     
     }
 }

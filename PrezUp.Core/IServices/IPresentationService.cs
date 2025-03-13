@@ -12,14 +12,14 @@ namespace PrezUp.Core.IServices
 {
    public interface IPresentationService
     {
-        public Task<List<PresentationDTO>> getallAsync();
+        public Task<Result<List<PresentationDTO>>> getallAsync();
 
-        public Task<PresentationDTO> getByIdAsync(int id);
+        public Task<Result<PresentationDTO>> getByIdAsync(int id);
 
-        public Task<bool> deleteAsync(int id, int userId);
+        public Task<Result<bool>> deleteAsync(int id, int userId);
 
         Task<Result<PresentationDTO>> AnalyzeAudioAsync(IFormFile audio, bool isPublic, int userId);
 
-        public Task<List<PresentationDTO>> GetPublicPresentationsAsync();
+        public Task<Result<List<PresentationDTO>>> GetPublicPresentationsAsync();
     }
 }

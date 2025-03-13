@@ -9,7 +9,7 @@ namespace PrezUp.API
         public MappingPostEntity()
         {
             //CreateMap<PresentationPost,PresentationDTO>();
-            CreateMap<UserPost, UserDTO>();
+            CreateMap<UserPost, UserDTO>().ReverseMap();
         }
     }
 }

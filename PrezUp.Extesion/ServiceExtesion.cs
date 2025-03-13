@@ -30,6 +30,7 @@ namespace PrezUp.Extesion
             s.AddScoped<IUserRepository, UserRepository>();
             s.AddScoped<IAuthService, AuthService>();
             s.AddAutoMapper(typeof(AutoMapperProfile));
+
             s.AddHttpClient();       
             var connectionString = configuration.GetConnectionString("DefaultConnection");
 
