@@ -24,14 +24,6 @@ namespace PrezUp.Core.Utils
         public string Url { get; set; }
     }
 
-    //public class NLPData
-    //{
-    //    public Analysis analysis { get; set; }
-
-    //}
-
-
-
     public class Result<T>
     {
         public bool IsSuccess { get; set; }
