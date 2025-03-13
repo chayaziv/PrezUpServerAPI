@@ -21,6 +21,8 @@ namespace PrezUp.Extesion
         public static void ServieDependencyInjector(this IServiceCollection s, IConfiguration configuration)
         {
             s.AddScoped<IPresentationService, PresentationService>();
+            s.AddScoped<IAudioAnalysisService, AudioAnalysisService>();
+            s.AddScoped<IAudioUpLoadService, AudioUploadService>();
             s.AddScoped<IUserService, UserService>();
             s.AddScoped<IRepositoryManager, RepositoryManager>();
             s.AddScoped(typeof(IRepository<>), typeof(Repository<>));
