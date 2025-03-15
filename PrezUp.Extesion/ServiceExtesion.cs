@@ -32,7 +32,9 @@ namespace PrezUp.Extesion
             s.AddScoped<IAuthService, AuthService>();
             s.AddAutoMapper(typeof(AutoMapperProfile));
             s.AddScoped<IValidatorService, ValidatorService>();
-            s.AddHttpClient();       
+            
+            s.AddHttpClient();    
+            
             var connectionString = configuration.GetConnectionString("DefaultConnection");
 
             s.AddDbContext<DataContext>(optionsBuilder =>
