@@ -20,12 +20,15 @@ builder.Services.AddAutoMapper(typeof(MappingPostEntity));
 builder.Host.UseSerilog((context, services, configuration) =>
     configuration
         .ReadFrom.Configuration(context.Configuration)  // קריאה מה-`appsettings.json`
-        .WriteTo.File("logs/fileupload.log", rollingInterval: RollingInterval.Day) // הגדרת קובץ הלוג
+        .WriteTo.File(
+            "logs/fileupload-.log",  // שם הקובץ עם "-" לפני הפורמט של יום
+            rollingInterval: RollingInterval.Day,  // הגדרת רולינג יומי
+            retainedFileCountLimit: 7  // שמור עד 7 קבצים ישנים
+        )
 );
 
-// הגדרת Serilog כמנהל הלוגים
-builder.Logging.ClearProviders();  // נקה את המפיקים ברירת המחדל
-builder.Logging.AddSerilog();  // הוסף את Serilog
+builder.Logging.ClearProviders();  
+builder.Logging.AddSerilog(); 
 
 
 
