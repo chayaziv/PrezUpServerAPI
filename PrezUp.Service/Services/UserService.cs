@@ -99,12 +99,14 @@ namespace PrezUp.Service.Services
         private readonly IRepositoryManager _repository;
         private readonly IMapper _mapper;
         private readonly IPresentationService _presentationService;
+        private readonly IValidatorService _validator;
 
-        public UserService(IRepositoryManager repository, IMapper mapper, IPresentationService presentationService)
+        public UserService(IRepositoryManager repository, IMapper mapper, IPresentationService presentationService, IValidatorService validator)
         {
             _repository = repository;
             _mapper = mapper;
             _presentationService = presentationService;
+            _validator = validator;
         }
 
         public async Task<Result<List<UserDTO>>> GetAllAsync()
@@ -127,6 +129,10 @@ namespace PrezUp.Service.Services
 
         public async Task<Result<UserDTO>> AddAsync(UserDTO user)
         {
+            var validatorResult = await _validator.ValidateUserAsync(user);
+            if (!validatorResult.IsValid)
+                return Result<UserDTO>.BadRequest(validatorResult.Message);
+            //cheack valid user
             var model = _mapper.Map<User>(user);
             await _repository.Users.AddAsync(model);
             await _repository.SaveAsync();
@@ -139,7 +145,8 @@ namespace PrezUp.Service.Services
             if (existingUser == null)
                 return Result<UserDTO>.NotFound("User not found");
 
-            var model = _mapper.Map(user, existingUser);
+            //check valid user
+            var model = _mapper.Map<User>(user);
             _repository.Users.UpdateAsync(model);
             await _repository.SaveAsync();
             return Result<UserDTO>.Success(_mapper.Map<UserDTO>(model));

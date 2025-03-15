@@ -13,7 +13,7 @@ namespace PrezUp.Core.EntityDTO
     public class PresentationDTO
     {
 
-       
+        public int Id { get; set; }
         public string? FileUrl { get; set; } = string.Empty;
         public int Clarity { get; set; }
         public string ClarityFeedback { get; set; }

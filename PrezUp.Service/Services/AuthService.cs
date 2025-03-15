@@ -24,33 +24,41 @@ namespace PrezUp.Service.Services
         private readonly IRepositoryManager _repository;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
+        private readonly IValidatorService _validator;
 
-        public AuthService(IRepositoryManager repository, IConfiguration configuration, IMapper mapper)
+        public AuthService(IRepositoryManager repository, IConfiguration configuration, IMapper mapper, IValidatorService validator)
         {
             _repository = repository;
             _configuration = configuration;
             _mapper = mapper;
+            _validator = validator;
         }
  
         public async Task<Result<AuthData>> RegisterUserAsync(RegisterModel model)
         {
-            if (await _repository.Users.ExistsByEmailAsync(model.Email))
-            {
 
-                return Result<AuthData>.BadRequest("Email already exists");
 
-            }
 
-            var newUser = new User
+
+            var userDto = new UserDTO
             {
                 Email = model.Email,
                 Name = model.UserName,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password) 
+                Password = model.Password
             };
+
+            //valid user !!!!!!!!!
+            var validorUser = await _validator.ValidateUserAsync(userDto);
+            if(!validorUser.IsValid)
+            {
+                return Result<AuthData>.BadRequest(validorUser.Message);
+            }
+            var newUser = _mapper.Map<User>(userDto);
 
             await _repository.Users.AddAsync(newUser);
             await _repository.SaveAsync();
-            var userDto = _mapper.Map<UserDTO>(newUser);
+
+            userDto = _mapper.Map<UserDTO>(newUser);
             var token = GenerateJwtToken(newUser);
    
             return Result<AuthData>.Success(new AuthData() { Token = token, User = userDto });

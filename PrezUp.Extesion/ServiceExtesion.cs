@@ -10,6 +10,7 @@ using PrezUp.Core;
 using PrezUp.Core.Entity;
 using PrezUp.Core.IRepositories;
 using PrezUp.Core.IServices;
+using PrezUp.Core.Service;
 using PrezUp.Data;
 using PrezUp.Data.Repositories;
 using PrezUp.Service.Services;
@@ -30,7 +31,7 @@ namespace PrezUp.Extesion
             s.AddScoped<IUserRepository, UserRepository>();
             s.AddScoped<IAuthService, AuthService>();
             s.AddAutoMapper(typeof(AutoMapperProfile));
-
+            s.AddScoped<IValidatorService, ValidatorService>();
             s.AddHttpClient();       
             var connectionString = configuration.GetConnectionString("DefaultConnection");
 
