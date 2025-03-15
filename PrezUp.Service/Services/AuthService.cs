@@ -47,7 +47,7 @@ namespace PrezUp.Service.Services
                 Password = model.Password
             };
 
-            //valid user !!!!!!!!!
+          
             var validorUser = await _validator.ValidateUserAsync(userDto);
             if(!validorUser.IsValid)
             {
@@ -68,10 +68,15 @@ namespace PrezUp.Service.Services
         public async Task<Result<AuthData>> LoginAsync(LoginModel model)
         {
             var existUser = await _repository.Users.GetByEmailAsync(model.Email);
-            if (existUser == null || !BCrypt.Net.BCrypt.Verify(model.Password, existUser.PasswordHash))
+            if (existUser == null)
             {
               
-                return Result<AuthData>.BadRequest("Invalid email or password");
+                return Result<AuthData>.BadRequest("Invalid email");
+            }
+            if (!BCrypt.Net.BCrypt.Verify(model.Password, existUser.PasswordHash))
+            {
+
+                return Result<AuthData>.BadRequest("Invalid password");
             }
             var userDto = _mapper.Map<UserDTO>(existUser);
             var token = GenerateJwtToken(existUser);
