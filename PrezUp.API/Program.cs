@@ -16,19 +16,23 @@ builder.Services.ServieDependencyInjector(builder.Configuration);
 builder.Services.AddCorsPolicy();
 builder.Services.AddAutoMapper(typeof(MappingPostEntity));
 
-
-builder.Host.UseSerilog((context, services, configuration) =>
+bool isLogged = false;
+if (isLogged)
+{
+    builder.Host.UseSerilog((context, services, configuration) =>
     configuration
-        .ReadFrom.Configuration(context.Configuration)  // קריאה מה-`appsettings.json`
+        .ReadFrom.Configuration(context.Configuration)
         .WriteTo.File(
-            "logs/fileupload-.log",  // שם הקובץ עם "-" לפני הפורמט של יום
-            rollingInterval: RollingInterval.Day,  // הגדרת רולינג יומי
-            retainedFileCountLimit: 7  // שמור עד 7 קבצים ישנים
+            "logs/fileupload-.log",
+            rollingInterval: RollingInterval.Day,
+            retainedFileCountLimit: 7
         )
 );
 
-builder.Logging.ClearProviders();  
-builder.Logging.AddSerilog(); 
+    builder.Logging.ClearProviders();
+    builder.Logging.AddSerilog();
+}
+
 
 
 
