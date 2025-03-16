@@ -14,7 +14,9 @@ namespace PrezUp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-   
+    
+    [Authorize(Policy = "UserOrAdmin")]
+
     public class PresentationController : ControllerBase
     {
         readonly IPresentationService _presentationService;
@@ -26,7 +28,7 @@ namespace PrezUp.API.Controllers
             _mapper = mapper;
         }
         [HttpPost("analyze-audio")]
-        [Authorize]
+        
         public async Task<IActionResult> AnalyzeAudio([FromForm] IFormFile audio, [FromForm] bool isPublic)
         {
            
@@ -94,7 +96,7 @@ namespace PrezUp.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
+      
         public async Task<IActionResult> DeletePresentation(int id)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -103,50 +105,6 @@ namespace PrezUp.API.Controllers
                 return StatusCode(result.StatusCode, new { message = result.ErrorMessage });
             return NoContent();
         }
-        //[HttpGet]
-        //public async Task<ActionResult<List<PresentationDTO>>> Get()
-        //{
-        //    return await _presentationService.getallAsync();
-        //}
-
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<PresentationDTO>> Get(int id)
-        //{
-        //    if (await _presentationService.getByIdAsync(id) == null)
-        //        return NotFound();
-        //    return Ok(_presentationService.getByIdAsync(id));
-        //}
-        //[HttpGet("public")]
-        //public async Task<ActionResult<List<PresentationDTO>>> GetPublicPresentations()
-        //{
-        //    var presentations = await _presentationService.GetPublicPresentationsAsync();
-        //    return Ok(presentations);
-        //}
-
-        //[HttpDelete("{id}")]
-        //[Authorize]
-        //public async Task<IActionResult> DeletePresentation(int id)
-        //{
-        //    try
-        //    {
-        //        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-        //        await _presentationService.deleteAsync(id, userId);
-        //        return NoContent();
-        //    }
-        //    catch (KeyNotFoundException ex)
-        //    {
-        //        return StatusCode(404, new { message = ex.Message });
-
-        //    }
-        //    catch (UnauthorizedAccessException ex)
-        //    {
-        //        return StatusCode(403, new { message = ex.Message });
-
-        //    }
-        //    catch (Exception )
-        //    {
-        //        return StatusCode(500, new { message = "An unexpected error occurred" });
-        //    }
-        //}     
+        
     }
 }

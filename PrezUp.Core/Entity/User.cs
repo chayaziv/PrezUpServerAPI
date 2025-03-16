@@ -43,41 +43,11 @@ namespace PrezUp.Core.Entity
         public string? AccountStatus { get; set; } = "Active";
 
         public List<Presentation> Presentations { get; set; }
-        //public List<UserRole> UserRoles { get; set; } = new();
+        public List<Role> Roles { get; set; } = new();
     }
 
     
 
-    //public class Role
-    //{
-    //    public int Id { get; set; }
-    //    public string RoleName { get; set; } = string.Empty;
-    //    public List<UserRole> UserRoles { get; set; } = new();
-    //    public List<RolePermission> RolePermissions { get; set; } = new();
-    //}
-
-    //public class Permission
-    //{
-    //    public int Id { get; set; }
-    //    public string PermissionName { get; set; } = string.Empty;
-    //}
-
-    //public class UserRole
-    //{
-    //    public int UserId { get; set; }
-    //    public User User { get; set; } = null!;
-    //    public int RoleId { get; set; }
-    //    public Role Role { get; set; } = null!;
-    //}
-
-    //public class RolePermission
-    //{
-    //    public int RoleId { get; set; }
-       
-    //    public Role Role { get; set; } = null!;
-    //    public int PermissionId { get; set; }
-    //    public Permission Permission { get; set; } = null!;
-    //}
 
 
 }

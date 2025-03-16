@@ -16,11 +16,13 @@ namespace PrezUp.Data.Repositories
 
         public IUserRepository Users { get; }
 
-        public RepositoryManager(DataContext context, IPresentationRepository presentations, IUserRepository users)
+        public IRoleRepository Roles { get; }
+        public RepositoryManager(DataContext context, IPresentationRepository presentations, IUserRepository users,IRoleRepository roles)
         {
             _context = context;
             Presentations = presentations;
             Users = users;
+            Roles = roles;
         }
         public async Task<int> SaveAsync()
         {

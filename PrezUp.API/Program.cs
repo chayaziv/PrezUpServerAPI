@@ -34,6 +34,12 @@ if (isLogged)
 }
 
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("admin"));
+    options.AddPolicy("UserOnly", policy => policy.RequireRole("user"));
+    options.AddPolicy("UserOrAdmin", policy => policy.RequireRole("user", "admin"));
+});
 
 
 

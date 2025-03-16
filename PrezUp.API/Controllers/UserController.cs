@@ -15,7 +15,8 @@ namespace PrezUp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize(Policy = "AdminOnly")]
+
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;

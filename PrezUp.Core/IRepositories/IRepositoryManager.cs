@@ -11,7 +11,7 @@ namespace PrezUp.Core.IRepositories
     {
         public IPresentationRepository Presentations { get; }
         public IUserRepository Users { get; }
-
+        public IRoleRepository Roles { get; }
         Task<int> SaveAsync();
     }
 }

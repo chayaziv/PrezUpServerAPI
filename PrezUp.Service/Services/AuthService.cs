@@ -55,6 +55,18 @@ namespace PrezUp.Service.Services
             }
             var newUser = _mapper.Map<User>(userDto);
 
+            
+           
+            var defaultRole = await _repository.Roles.GetByNameAsync("user");
+
+            if (defaultRole == null)
+            {
+                return Result<AuthData>.BadRequest("Default role 'user' not found.");
+            }
+
+            newUser.Roles.Add(defaultRole);
+
+         
             await _repository.Users.AddAsync(newUser);
             await _repository.SaveAsync();
 
@@ -94,6 +106,12 @@ namespace PrezUp.Service.Services
                 new Claim(ClaimTypes.Email, user.Email),
             };
 
+
+            // Add roles to the JWT claims
+            foreach (var role in user.Roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role.RoleName));
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

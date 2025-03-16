@@ -29,10 +29,13 @@ namespace PrezUp.Extesion
             s.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             s.AddScoped<IPresentationRepository, PresentationRepository>();
             s.AddScoped<IUserRepository, UserRepository>();
+            s.AddScoped<IRoleRepository, RoleRepository>();
+
+
             s.AddScoped<IAuthService, AuthService>();
             s.AddAutoMapper(typeof(AutoMapperProfile));
             s.AddScoped<IValidatorService, ValidatorService>();
-            
+           
             s.AddHttpClient();    
             
             var connectionString = configuration.GetConnectionString("DefaultConnection");
