@@ -14,6 +14,7 @@ namespace PrezUp.Core.EntityDTO
     {
 
         public int Id { get; set; }
+        public string Title { get; set; }
         public string? FileUrl { get; set; } = string.Empty;
         public int Clarity { get; set; }
         public string ClarityFeedback { get; set; }

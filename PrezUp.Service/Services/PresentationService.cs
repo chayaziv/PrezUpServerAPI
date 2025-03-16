@@ -33,13 +33,13 @@ namespace PrezUp.Service.Services
             _audioUploadService = audioUploadService;
             _audioAnalysisService = audioAnalysisService;
             _mapper = mapper;
-        }   
-        public async Task<Result<PresentationDTO>> AnalyzeAudioAsync(IFormFile audio, bool isPublic, int userId)
+        }
+        public async Task<Result<PresentationDTO>> AnalyzeAudioAsync(IFormFile audio, bool isPublic, string title, int userId)
         {
-            
+
             string fileKey = $"recordings/{Guid.NewGuid()}.wav";
             var S3Result = await _audioUploadService.UploadFileToS3Async(audio.OpenReadStream(), fileKey);
-            if(!S3Result.IsSuccess)
+            if (!S3Result.IsSuccess)
             {
                 return Result<PresentationDTO>.Failure(S3Result.ErrorMessage);
             }
@@ -49,12 +49,13 @@ namespace PrezUp.Service.Services
             {
                 return Result<PresentationDTO>.Failure(S3Result.ErrorMessage);
             }
-            
+
             Presentation presentation = _mapper.Map<Presentation>(NLPResult.Data);
-           
+
             presentation.IsPublic = isPublic;
-            presentation.FileUrl = fileUrl;
+            presentation.FileUrl = fileUrl ?? "";
             presentation.UserId = userId;
+            presentation.Title = title ?? "";
             await _repository.Presentations.AddAsync(presentation);
             if (await _repository.SaveAsync() == 0)
             {

@@ -100,7 +100,7 @@ namespace PrezUp.Service.Services
         {
             var presentations = await _repository.Presentations.GetPresentationsByUserIdAsync(userId);
             if (presentations == null || !presentations.Any())
-                return Result<List<PresentationDTO>>.NotFound("No presentations found for this user");
+                return Result<List<PresentationDTO>>.SuccessNoContent();
 
             return Result<List<PresentationDTO>>.Success(_mapper.Map<List<PresentationDTO>>(presentations));
         }

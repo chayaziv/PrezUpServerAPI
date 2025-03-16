@@ -72,7 +72,7 @@ namespace PrezUp.Service.Services
                
                 Uri uri = new Uri(fileUrl);
                 string objectKey = uri.AbsolutePath.TrimStart('/');
-
+                Console.WriteLine($"\n\n\n\n ----------------({uri})---------------------\n\n\n\n");
                 using var s3Client = new AmazonS3Client(_accessKey, _secretKey, _region);
                 var deleteObjectRequest = new DeleteObjectRequest
                 {

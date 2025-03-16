@@ -29,9 +29,12 @@ namespace PrezUp.API.Controllers
         }
         [HttpPost("analyze-audio")]
         
-        public async Task<IActionResult> AnalyzeAudio([FromForm] IFormFile audio, [FromForm] bool isPublic)
+        public async Task<IActionResult> AnalyzeAudio([FromForm] IFormFile audio, [FromForm] bool isPublic, [FromForm] string title)
         {
-           
+            if(string.IsNullOrWhiteSpace(title))
+            {
+                return BadRequest(new { error = "Title is required" });
+            }
             if (audio == null || audio.Length == 0)
             {
                 return BadRequest(new { error = "No audio file provided" });
@@ -50,7 +53,7 @@ namespace PrezUp.API.Controllers
                 int userId = int.Parse(userIdClaim.Value);
                
            
-                var result  = await _presentationService.AnalyzeAudioAsync(audio, isPublic, userId);
+                var result  = await _presentationService.AnalyzeAudioAsync(audio, isPublic,title, userId);
                 if(result.IsSuccess)
                 {
                   

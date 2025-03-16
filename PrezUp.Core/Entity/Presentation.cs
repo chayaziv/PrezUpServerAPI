@@ -12,7 +12,8 @@ namespace PrezUp.Core.Entity
     public class Presentation
     {
         [Key]
-        public int Id { get; set; }    
+        public int Id { get; set; }
+        public string  Title { get; set; }= string.Empty;
         public string? FileUrl { get; set; } = string.Empty;
         public int Clarity { get; set; }
         public string ClarityFeedback { get; set; }

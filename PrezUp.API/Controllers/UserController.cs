@@ -15,7 +15,7 @@ namespace PrezUp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Policy = "AdminOnly")]
+  
 
     public class UsersController : ControllerBase
     {
@@ -28,7 +28,8 @@ namespace PrezUp.API.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]      
+        [HttpGet]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<List<UserDTO>>> Get()
         {
             var result= await _userService.GetAllAsync();
@@ -40,7 +41,7 @@ namespace PrezUp.API.Controllers
         }
 
         [HttpGet("{id}")]
-        
+        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<UserDTO>> Get(int id)
         {
             var result = await _userService.GetByIdAsync(id);
@@ -52,6 +53,7 @@ namespace PrezUp.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<UserDTO>> Post([FromBody] UserPost user)
         {
            
@@ -66,6 +68,7 @@ namespace PrezUp.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<UserDTO>> Put(int id, [FromBody] UserPost user)
         {
             var dto = _mapper.Map<UserDTO>(user);
@@ -78,6 +81,7 @@ namespace PrezUp.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult> Delete(int id)
         {
             var result = await _userService.DeleteAsync(id);
@@ -90,6 +94,7 @@ namespace PrezUp.API.Controllers
         
         
         [HttpGet("my-presentations")]
+        [Authorize(Policy = "UserOrAdmin")]
         public async Task<ActionResult<List<PresentationDTO>>> GetUserPresentations()
         {
           

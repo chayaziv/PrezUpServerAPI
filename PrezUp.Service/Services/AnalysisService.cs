@@ -43,9 +43,23 @@ namespace PrezUp.Service.Services
                 }
 
                 var responseContent = await response.Content.ReadAsStringAsync();
-                var cleanedContent = responseContent.Replace("```json", "").Replace("```", "").Trim();
-                JObject jsonObject = JObject.Parse(cleanedContent);
+                //var cleanedContent = responseContent.Replace("```json", "").Replace("```", "").Trim();
+                //JObject jsonObject = JObject.Parse(cleanedContent);
+                // מוצא את האינדקס של "```json"
+                int jsonStartIndex = responseContent.IndexOf("```json");
 
+                if (jsonStartIndex != -1)
+                {
+                    // חותך את כל מה שלפני "```json"
+                    responseContent = responseContent.Substring(jsonStartIndex + 7); // 7 כי "```json" זה 7 תווים
+                }
+
+                // מנקה את התוכן משאריות של ```  
+                var cleanedContent = responseContent.Replace("```", "").Trim();
+
+                // ממיר ל- JObject
+                JObject jsonObject = JObject.Parse(cleanedContent);
+                //----------
                 var analysis= ParseAnalysisResult(jsonObject);
                 return Result<Analysis>.Success( analysis);
             }
