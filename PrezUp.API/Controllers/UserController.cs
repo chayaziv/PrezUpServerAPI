@@ -54,10 +54,10 @@ namespace PrezUp.API.Controllers
 
         [HttpPost]
         [Authorize(Policy = "AdminOnly")]
-        public async Task<ActionResult<UserDTO>> Post([FromBody] UserPost user)
+        public async Task<ActionResult<UserDTO>> Post([FromBody] UserAdminPost user)
         {
            
-            var dto= _mapper.Map<UserDTO>(user);
+            var dto= _mapper.Map<UserAdminDTO>(user);
            
             var result = await _userService.AddAsync(dto);
             if (!result.IsSuccess)

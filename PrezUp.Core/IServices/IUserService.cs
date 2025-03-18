@@ -13,7 +13,7 @@ namespace PrezUp.Core.IServices
     {
         Task<Result<List<UserAdminDTO>>> GetAllAsync();
         Task<Result<UserDTO>> GetByIdAsync(int id);
-        Task<Result<UserDTO>> AddAsync(UserDTO user);
+        Task<Result<UserAdminDTO>> AddAsync(UserAdminDTO user);
         Task<Result<UserAdminDTO>> UpdateAdminAsync(int id, UserAdminDTO user);
         Task<Result<bool>> DeleteAsync(int id);
 

@@ -46,15 +46,23 @@ namespace PrezUp.Service.Services
             return Result<UserDTO>.Success(_mapper.Map<UserDTO>(item));
         }
 
-        public async Task<Result<UserDTO>> AddAsync(UserDTO user)
+        public async Task<Result<UserAdminDTO>> AddAsync(UserAdminDTO user)
         {
-            var validatorResult = await _validator.ValidateUserAsync(user);
-            if (!validatorResult.IsValid)
-                return Result<UserDTO>.BadRequest(validatorResult.Message);
+            //var validatorResult = await _validator.ValidateUserAsync(user);
+            //if (!validatorResult.IsValid)
+            //    return Result<UserAdminDTO>.BadRequest(validatorResult.Message);
             var model = _mapper.Map<User>(user);
+            var role = await _repository.Roles.GetByIdAsync(user.Role.Id);
+            if (role != null)
+            {
+                if (!model.Roles.Any(r => r.Id == role.Id))
+                {
+                    model.Roles.Add(role);
+                }
+            }
             await _repository.Users.AddAsync(model);
             await _repository.SaveAsync();
-            return Result<UserDTO>.Success(_mapper.Map<UserDTO>(model));
+            return Result<UserAdminDTO>.Success(_mapper.Map<UserAdminDTO>(model));
         }
 
        
