@@ -26,6 +26,19 @@ namespace PrezUp.Data.Repositories
                 .Include(u => u.Roles) 
                 .FirstOrDefaultAsync(u => u.Email == email);
         }
+        public async Task<List<User>> GetUsersWithRoles()
+        {
+            return await _dbSet.Include(u=>u.Roles).ToListAsync();
+        }
+        public async Task<User?> GetByIdAsync(int id, bool includeRoles = false)
+        {
+           
+
+            if (includeRoles)
+                return await  _dbSet.Include(u => u.Roles).FirstOrDefaultAsync(u => u.Id == id);
+
+            return await _dbSet.FirstOrDefaultAsync(u => u.Id == id);
+        }
 
 
     }

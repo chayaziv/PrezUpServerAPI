@@ -10,6 +10,8 @@ namespace PrezUp.API
         {
             //CreateMap<PresentationPost,PresentationDTO>();
             CreateMap<UserPost, UserDTO>().ReverseMap();
+
+            CreateMap<UserAdminPost, UserAdminDTO>().ReverseMap();
         }
     }
 }

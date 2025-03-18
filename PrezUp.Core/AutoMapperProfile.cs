@@ -11,7 +11,7 @@ namespace PrezUp.Core
         public AutoMapperProfile()
         {
             CreateMap<Presentation, PresentationDTO>().ReverseMap();
-            
+
             CreateMap<Analysis, Presentation>();
 
             CreateMap<User, UserDTO>()
@@ -20,7 +20,17 @@ namespace PrezUp.Core
             // הצפנת הסיסמא בזמן המרת ה-DTO חזרה ל-Entity
             CreateMap<UserDTO, User>()
                 .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => EncryptPassword(src.Password)));
+            CreateMap<Role, RoleDTO>();
 
+            CreateMap<User, UserAdminDTO>()
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Roles.Any() ? src.Roles.First() : new Role() { Id = 0, RoleName = "unknown" }))
+                    .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.PasswordHash))
+                     .ReverseMap()
+    .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => EncryptPassword( src.Password)));
+    
+
+
+            CreateMap<UserAdminDTO, UserDTO>();
 
         }
 

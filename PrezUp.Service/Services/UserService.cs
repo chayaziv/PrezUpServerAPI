@@ -28,13 +28,13 @@ namespace PrezUp.Service.Services
             _validator = validator;
         }
 
-        public async Task<Result<List<UserDTO>>> GetAllAsync()
+        public async Task<Result<List<UserAdminDTO>>> GetAllAsync()
         {
-            var list = await _repository.Users.GetListAsync();
+            var list = await _repository.Users.GetUsersWithRoles();
             if (list == null || !list.Any())
-                return Result<List<UserDTO>>.NotFound("No users found");
+                return Result<List<UserAdminDTO>>.NotFound("No users found");
 
-            return Result<List<UserDTO>>.Success(_mapper.Map<List<UserDTO>>(list));
+            return Result<List<UserAdminDTO>>.Success(_mapper.Map<List<UserAdminDTO>>(list));
         }
 
         public async Task<Result<UserDTO>> GetByIdAsync(int id)
@@ -57,20 +57,26 @@ namespace PrezUp.Service.Services
             return Result<UserDTO>.Success(_mapper.Map<UserDTO>(model));
         }
 
-        public async Task<Result<UserDTO>> UpdateAsync(int id, UserDTO user)
+       
+        public async Task<Result<UserAdminDTO>> UpdateAdminAsync(int id, UserAdminDTO user)
         {
-            var existingUser = await _repository.Users.GetByIdAsync(id);
+            var existingUser = await _repository.Users.GetByIdAsync(id,true);
             if (existingUser == null)
-                return Result<UserDTO>.NotFound("User not found");
-
-            var validatorResult = await _validator.ValidateUserAsync(user);
-            if (!validatorResult.IsValid)
-                return Result<UserDTO>.BadRequest(validatorResult.Message);
-          
-            var model = _mapper.Map<User>(user);
-            _repository.Users.UpdateAsync(model);
-            await _repository.SaveAsync();
-            return Result<UserDTO>.Success(_mapper.Map<UserDTO>(model));
+                return Result<UserAdminDTO>.NotFound("User not found");
+            if (user.Role.Id != 1 && user.Role.Id != 2)
+                return Result<UserAdminDTO>.NotFound("Invalid Role");
+            _mapper.Map(user, existingUser);        
+            existingUser.Roles.Clear();
+            var role = await _repository.Roles.GetByIdAsync(user.Role.Id);
+            if (role != null)
+            {
+                if (!existingUser.Roles.Any(r => r.Id == role.Id))
+                {
+                    existingUser.Roles.Add(role);
+                }
+            }
+            await _repository.SaveAsync(); 
+            return Result<UserAdminDTO>.Success(_mapper.Map<UserAdminDTO>(existingUser));
         }
 
         public async Task<Result<bool>> DeleteAsync(int id)
@@ -83,9 +89,9 @@ namespace PrezUp.Service.Services
             var success = true;
             foreach (var presentation in presentations)
             {
-              var res= await _presentationService.deleteAsync(presentation.Id, user.Id);
+                var res = await _presentationService.deleteAsync(presentation.Id, user.Id);
                 if (!res.IsSuccess)
-                    success=false ;
+                    success = false;
             }
             _repository.Users.DeleteAsync(user);
             if (await _repository.SaveAsync() == 0)

@@ -31,8 +31,8 @@
             {
                 _logger.LogWarning("User {UserId} is trying to upload a file too soon. Please wait for 1 minutes.", userId);
                 context.Response.StatusCode = 429; // Too Many Requests
-                await context.Response.WriteAsync("You can only upload files every 1 minutes.");
-                return;
+                await context.Response.WriteAsync( "You can only upload files every 1 minutes." );
+                return ;
             }
 
            

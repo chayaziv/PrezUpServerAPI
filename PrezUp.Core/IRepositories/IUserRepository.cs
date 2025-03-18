@@ -12,5 +12,8 @@ namespace PrezUp.Core.IRepositories
         Task<bool> ExistsByEmailAsync(string email);
         Task<User?> GetByEmailAsync(string email);
 
+        Task<List<User>> GetUsersWithRoles();
+        Task<User?> GetByIdAsync(int id, bool includeRoles = false);
+
     }
 }

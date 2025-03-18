@@ -30,7 +30,7 @@ namespace PrezUp.API.Controllers
 
         [HttpGet]
         [Authorize(Policy = "AdminOnly")]
-        public async Task<ActionResult<List<UserDTO>>> Get()
+        public async Task<ActionResult<List<UserAdminDTO>>> Get()
         {
             var result= await _userService.GetAllAsync();
             if (!result.IsSuccess)
@@ -69,10 +69,10 @@ namespace PrezUp.API.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Policy = "AdminOnly")]
-        public async Task<ActionResult<UserDTO>> Put(int id, [FromBody] UserPost user)
+        public async Task<ActionResult<UserDTO>> Put(int id, [FromBody] UserAdminDTO user)
         {
-            var dto = _mapper.Map<UserDTO>(user);
-            var result = await _userService.UpdateAsync(id, dto);
+            
+            var result = await _userService.UpdateAdminAsync(id, user);
             if (!result.IsSuccess)
             {
                 return StatusCode(result.StatusCode, new { messege = result.ErrorMessage });
