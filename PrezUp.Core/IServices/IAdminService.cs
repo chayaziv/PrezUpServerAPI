@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PrezUp.Core.EntityDTO;
+using PrezUp.Core.Utils;
 
 namespace PrezUp.Core.IServices
 {
     public interface IAdminService
     {
-        Task<AdminDashboardDto> GetDashboardDataAsync();
+        Task<Result<AdminDashboardDto>> GetDashboardDataAsync();
     }
 }

@@ -10,7 +10,7 @@ namespace PrezUp.Core.IRepositories
 {
     public interface IRoleRepository : IRepository<Role>
     {
-         Task<Role> GetByNameAsync(string roleName);
+        Task<Role> GetByNameAsync(string roleName);
         Task<List<RoleDistributionDto>> GetRolesDistributionAsync();
     }
 }

@@ -25,6 +25,9 @@ namespace PrezUp.Extesion
             s.AddScoped<IAnalysisService, AnalysisService>();
             s.AddScoped<Is3Service, AudioUploadService>();
             s.AddScoped<IUserService, UserService>();
+            s.AddScoped<IAuthService, AuthService>();
+            s.AddScoped<IAdminService, AdminService>();
+
             s.AddScoped<IRepositoryManager, RepositoryManager>();
             s.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             s.AddScoped<IPresentationRepository, PresentationRepository>();
@@ -32,7 +35,7 @@ namespace PrezUp.Extesion
             s.AddScoped<IRoleRepository, RoleRepository>();
 
 
-            s.AddScoped<IAuthService, AuthService>();
+           
             s.AddAutoMapper(typeof(AutoMapperProfile));
             s.AddScoped<IValidatorService, ValidatorService>();
            

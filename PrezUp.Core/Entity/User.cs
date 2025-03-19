@@ -39,7 +39,6 @@ namespace PrezUp.Core.Entity
 
         
         // תיעוד סטטוס
-       public DateOnly CreateAt { get; set; }
         public string? AccountStatus { get; set; } = "Active";
 
         public List<Presentation> Presentations { get; set; }

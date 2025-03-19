@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PrezUp.Core.Entity;
+using PrezUp.Core.EntityDTO;
 using PrezUp.Core.IRepositories;
 
 namespace PrezUp.Data.Repositories
@@ -27,7 +28,16 @@ namespace PrezUp.Data.Repositories
 
         public async Task<int> GetTotalPresentationsAsync() => await _dbSet.CountAsync();
         public async Task<int> GetPublicPresentationsCountAsync() => await _dbSet.CountAsync(p => p.IsPublic);
+        //public async Task<List<TopUserDto>> GetTopUsersAsync()
+        //{
+        //    return await _dbSet
+        //        .OrderByDescending(u => u.Presentations.Count)
+        //        .Take(5)
+        //        .Select(u => new TopUserDto { UserId = u.Id, UserName = u.Name, PresentationsCount = u.Presentations.Count() })
+        //        .ToListAsync();
+        //}
 
-       
+
+
     }
 }

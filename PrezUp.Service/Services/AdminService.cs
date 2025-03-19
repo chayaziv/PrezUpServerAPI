@@ -4,11 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Amazon.Runtime.Internal;
+using PrezUp.Core.EntityDTO;
 using PrezUp.Core.IRepositories;
+using PrezUp.Core.IServices;
+using PrezUp.Core.Utils;
 
 namespace PrezUp.Service.Services
 {
-    public class AdminService
+    public class AdminService : IAdminService
     {
         private readonly IRepositoryManager _repository;
 
@@ -17,99 +20,34 @@ namespace PrezUp.Service.Services
             _repository = manager;
         }
 
-        public async Task<object> GetUsersActivity()
+        public async Task<Result<AdminDashboardDto>> GetDashboardDataAsync()
         {
-            var userActivity = await _context.Users
-                .Select(u => new
-                {
-                    u.Id,
-                    u.Name,
-                    PresentationCount = u.Presentations.Count()
-                })
-                .ToListAsync();
-
-            return new
+           var dashboard= new AdminDashboardDto
             {
-                TotalUsers = userActivity.Count,
-                ActiveUsers = userActivity.Count(u => u.PresentationCount > 0),
-                InactiveUsers = userActivity.Count(u => u.PresentationCount == 0),
-                UserActivity = userActivity
+                UserStatistics = new UserStatisticsDto
+                {
+                    TotalUsers = await _repository.Users.GetTotalUsersAsync(),
+                    ActiveUsers = await _repository.Users.GetActiveUsersAsync(),
+                    InactiveUsers = await _repository.Users.GetInactiveUsersAsync()
+                },
+                UserActivities = await _repository.Users.GetUserActivityAsync(),
+                RolesDistribution = await _repository.Roles.GetRolesDistributionAsync(),
+                PresentationStatistics = new PresentationStatisticsDto
+                {
+                    TotalPresentations = await _repository.Presentations.GetTotalPresentationsAsync(),
+                    PublicPresentations = await _repository.Presentations.GetPublicPresentationsCountAsync()
+                },
+                TopUsers = await _repository.Users.GetTopUsersAsync(),
+                //MonthlyPresentations = await _adminRepository.GetMonthlyPresentationsAsync(),
+                MonthlyPresentations = new List<MonthlyPresentationsDto>(),
+                UnusualActivities = await _repository.Users.GetUnusualActivityAsync()
             };
-        }
-
-        public async Task<object> GetRolesDistribution()
-        {
-            var roleDistribution = await _context.Roles
-                .Select(r => new
-                {
-                    RoleName = r.RoleName,
-                    UserCount = r.Users.Count()
-                })
-                .ToListAsync();
-
-            return roleDistribution;
-        }
-
-        public async Task<object> GetPresentationStats()
-        {
-            var totalPresentations = await _context.Presentations.CountAsync();
-            var publicPresentations = await _context.Presentations.CountAsync(p => p.IsPublic);
-            var privatePresentations = totalPresentations - publicPresentations;
-
-            var topUsers = await _context.Users
-                .OrderByDescending(u => u.Presentations.Count)
-                .Take(5)
-                .Select(u => new
-                {
-                    u.Id,
-                    u.Name,
-                    PresentationsCount = u.Presentations.Count()
-                })
-                .ToListAsync();
-
-            return new
+            if (dashboard == null)
             {
-                TotalPresentations = totalPresentations,
-                PublicPresentations = publicPresentations,
-                PrivatePresentations = privatePresentations,
-                TopUsers = topUsers
-            };
+                return Result<AdminDashboardDto>.Failure("error in loading data");
+            }
+            return Result<AdminDashboardDto>.Success(dashboard);
         }
 
-        public async Task<object> GetMonthlyPresentations()
-        {
-            var sixMonthsAgo = DateTime.UtcNow.AddMonths(-6);
-
-            var monthlyData = await _context.Presentations
-                .Where(p => p.Id > 0) // להחליף לתאריך יצירה אם קיים
-                .GroupBy(p => new { Year = DateTime.UtcNow.Year, Month = DateTime.UtcNow.Month }) // להחליף לפי תאריך יצירה
-                .Select(g => new
-                {
-                    Year = g.Key.Year,
-                    Month = g.Key.Month,
-                    Count = g.Count()
-                })
-                .OrderBy(g => g.Year).ThenBy(g => g.Month)
-                .ToListAsync();
-
-            return monthlyData;
-        }
-
-        public async Task<object> GetUnusualActivity()
-        {
-            var threshold = 10; // מספר מינימלי של מצגות בפרק זמן קצר שנחשב לחריג
-
-            var unusualUsers = await _context.Users
-                .Where(u => u.Presentations.Count > threshold)
-                .Select(u => new
-                {
-                    u.Id,
-                    u.Name,
-                    PresentationsCount = u.Presentations.Count()
-                })
-                .ToListAsync();
-
-            return unusualUsers;
-        }
     }
 }

@@ -23,21 +23,5 @@ namespace PrezUp.Core.Entity
         public string PermissionName { get; set; } = string.Empty;
         public List<Role> Roles { get; set; } = new();
     }
-    //[Table("UserRole")]
-    //public class UserRole
-    //{
-    //    public int UserId { get; set; }
-    //    public User User { get; set; } = null!;
-    //    public int RoleId { get; set; }
-    //    public Role Role { get; set; } = null!;
-    //}
-    //[Table("RolePermission")]
-    //public class RolePermission
-    //{
-    //    public int RoleId { get; set; }
-
-    //    public Role Role { get; set; } = null!;
-    //    public int PermissionId { get; set; }
-    //    public Permission Permission { get; set; } = null!;
-    //}
+   
 }
