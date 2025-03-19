@@ -24,13 +24,6 @@ namespace PrezUp.Core.EntityDTO
         public int InactiveUsers { get; set; }
     }
 
-    public class UserActivityDto
-    {
-        public int UserId { get; set; }
-        public string UserName { get; set; }
-        public int PresentationCount { get; set; }
-    }
-
     public class RoleDistributionDto
     {
         public string RoleName { get; set; }
@@ -43,24 +36,25 @@ namespace PrezUp.Core.EntityDTO
         public int PublicPresentations { get; set; }
     }
 
-    public class TopUserDto
+    // מחלקת בסיס למידע על משתמשים ופרזנטציות
+    public abstract class BaseUserPresentationStatsDto
     {
         public int UserId { get; set; }
         public string UserName { get; set; }
-        public int PresentationsCount { get; set; }
+        public int PresentationCount { get; set; }
     }
+
+    // מחלקות היורשות מהבסיס
+    public class UserActivityDto : BaseUserPresentationStatsDto { }
+
+    public class TopUserDto : BaseUserPresentationStatsDto { }
+
+    public class UnusualActivityDto : BaseUserPresentationStatsDto { }
 
     public class MonthlyPresentationsDto
     {
         public int Month { get; set; }
         public int Year { get; set; }
         public int PresentationCount { get; set; }
-    }
-
-    public class UnusualActivityDto
-    {
-        public int UserId { get; set; }
-        public string UserName { get; set; }
-        public int PresentationsCount { get; set; }
     }
 }
