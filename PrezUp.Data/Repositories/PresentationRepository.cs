@@ -25,29 +25,9 @@ namespace PrezUp.Data.Repositories
         }
 
 
-        //public async Task<Presentation> SaveAnalysisAsync(Presentation analysisResult)
-        //{
-        //    Presentation presentation = new Presentation()
-        //    {
-        //        Clarity = analysisResult.Clarity,
-        //        ClarityFeedback = analysisResult.ClarityFeedback,
-        //        Fluency = analysisResult.Fluency,
-        //        FluencyFeedback = analysisResult.FluencyFeedback,
-        //        Confidence = analysisResult.Confidence,
-        //        ConfidenceFeedback = analysisResult.ConfidenceFeedback,
-        //        Engagement = analysisResult.Engagement,
-        //        EngagementFeedback = analysisResult.EngagementFeedback,
-        //        SpeechStyle = analysisResult.SpeechStyle,
-        //        SpeechStyleFeedback = analysisResult.SpeechStyleFeedback,
-        //        Score = analysisResult.Score,
-        //        Tips = analysisResult.Tips,
-        //        UserId = userId,
-        //        IsPublic=isPublic,
-        //        FileUrl=fileUrl
+        public async Task<int> GetTotalPresentationsAsync() => await _dbSet.CountAsync();
+        public async Task<int> GetPublicPresentationsCountAsync() => await _dbSet.CountAsync(p => p.IsPublic);
 
-        //    };
-        //    AddAsync(presentation);
-        //    return presentation;
-        //}
+       
     }
 }

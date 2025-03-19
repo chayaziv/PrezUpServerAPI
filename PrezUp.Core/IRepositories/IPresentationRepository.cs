@@ -7,11 +7,12 @@ using PrezUp.Core.Entity;
 
 namespace PrezUp.Core.IRepositories
 {
-   public interface  IPresentationRepository : IRepository<Presentation>
-   {
-       public Task<List<Presentation>> GetPresentationsByUserIdAsync(int userId);
-       //public Task<Presentation> SaveAnalysisAsync(AnalysisResult analysisResult,bool isPublic,int userId, string fileUrl);
-       public  Task<List<Presentation>> GetPublicPresentationsAsync();
-   }
+    public interface IPresentationRepository : IRepository<Presentation>
+    {
+        public Task<List<Presentation>> GetPresentationsByUserIdAsync(int userId);
+    
+        public Task<List<Presentation>> GetPublicPresentationsAsync();
+        public Task<int> GetPublicPresentationsCountAsync();
+    }
 }
 ;
