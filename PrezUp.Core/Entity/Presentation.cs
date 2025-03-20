@@ -36,7 +36,7 @@ namespace PrezUp.Core.Entity
         [ForeignKey("UserId")]
         public User User { get; set; }
 
-        public List<Tag> Tags = new();
+        public List<Tag> Tags { get; set; } = new();
      
       
     }

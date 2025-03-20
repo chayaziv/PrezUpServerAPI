@@ -27,30 +27,30 @@ namespace PrezUp.Data.Migrations
                 name: "PresentationTag",
                 columns: table => new
                 {
-                    PresentationId = table.Column<int>(type: "int", nullable: false),
-                    TagId = table.Column<int>(type: "int", nullable: false)
+                    PresentationsId = table.Column<int>(type: "int", nullable: false),
+                    TagsId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PresentationTag", x => new { x.PresentationId, x.TagId });
+                    table.PrimaryKey("PK_PresentationTag", x => new { x.PresentationsId, x.TagsId });
                     table.ForeignKey(
-                        name: "FK_PresentationTag_Presentation_PresentationId",
-                        column: x => x.PresentationId,
+                        name: "FK_PresentationTag_Presentation_PresentationsId",
+                        column: x => x.PresentationsId,
                         principalTable: "Presentation",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PresentationTag_Tags_TagId",
-                        column: x => x.TagId,
+                        name: "FK_PresentationTag_Tags_TagsId",
+                        column: x => x.TagsId,
                         principalTable: "Tags",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_PresentationTag_TagId",
+                name: "IX_PresentationTag_TagsId",
                 table: "PresentationTag",
-                column: "TagId");
+                column: "TagsId");
         }
 
         /// <inheritdoc />

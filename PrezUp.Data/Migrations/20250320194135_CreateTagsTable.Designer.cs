@@ -11,7 +11,7 @@ using PrezUp.Data;
 namespace PrezUp.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250320182222_CreateTagsTable")]
+    [Migration("20250320194135_CreateTagsTable")]
     partial class CreateTagsTable
     {
         /// <inheritdoc />
@@ -41,15 +41,15 @@ namespace PrezUp.Data.Migrations
 
             modelBuilder.Entity("PresentationTag", b =>
                 {
-                    b.Property<int>("PresentationId")
+                    b.Property<int>("PresentationsId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TagId")
+                    b.Property<int>("TagsId")
                         .HasColumnType("int");
 
-                    b.HasKey("PresentationId", "TagId");
+                    b.HasKey("PresentationsId", "TagsId");
 
-                    b.HasIndex("TagId");
+                    b.HasIndex("TagsId");
 
                     b.ToTable("PresentationTag");
                 });
@@ -254,13 +254,13 @@ namespace PrezUp.Data.Migrations
                 {
                     b.HasOne("PrezUp.Core.Entity.Presentation", null)
                         .WithMany()
-                        .HasForeignKey("PresentationId")
+                        .HasForeignKey("PresentationsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("PrezUp.Core.Entity.Tag", null)
                         .WithMany()
-                        .HasForeignKey("TagId")
+                        .HasForeignKey("TagsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
