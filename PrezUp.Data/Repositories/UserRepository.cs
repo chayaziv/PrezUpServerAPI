@@ -63,7 +63,7 @@ namespace PrezUp.Data.Repositories
         public async Task<List<UnusualActivityDto>> GetUnusualActivityAsync()
         {
             return await _dbSet
-                .Where(u => u.Presentations.Count > 10)
+                .Where(u => u.Presentations.Count >= 0)
                 .Select(u => new UnusualActivityDto { UserId = u.Id, UserName = u.Name, PresentationCount = u.Presentations.Count() })
                 .ToListAsync();
         }

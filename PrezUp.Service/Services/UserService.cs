@@ -69,11 +69,13 @@ namespace PrezUp.Service.Services
         public async Task<Result<UserAdminDTO>> UpdateAdminAsync(int id, UserAdminDTO user)
         {
             var existingUser = await _repository.Users.GetByIdAsync(id,true);
+            var password = existingUser.PasswordHash;
             if (existingUser == null)
                 return Result<UserAdminDTO>.NotFound("User not found");
             if (user.Role.Id != 1 && user.Role.Id != 2)
                 return Result<UserAdminDTO>.NotFound("Invalid Role");
-            _mapper.Map(user, existingUser);        
+            _mapper.Map(user, existingUser);
+            existingUser.PasswordHash = password;
             existingUser.Roles.Clear();
             var role = await _repository.Roles.GetByIdAsync(user.Role.Id);
             if (role != null)
