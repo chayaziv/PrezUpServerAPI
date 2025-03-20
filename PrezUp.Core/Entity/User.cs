@@ -43,6 +43,7 @@ namespace PrezUp.Core.Entity
 
         public List<Presentation> Presentations { get; set; }
         public List<Role> Roles { get; set; } = new();
+       
     }
 
     
