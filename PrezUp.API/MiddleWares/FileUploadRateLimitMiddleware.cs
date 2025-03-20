@@ -27,7 +27,7 @@
             var now = DateTime.UtcNow;
 
            
-            if (LastUploadTimes.ContainsKey(userId) && (now - LastUploadTimes[userId]).TotalMinutes < 1)
+            if (LastUploadTimes.ContainsKey(userId) && (now - LastUploadTimes[userId]).TotalMinutes < 0)
             {
                 _logger.LogWarning("User {UserId} is trying to upload a file too soon. Please wait for 1 minutes.", userId);
                 context.Response.StatusCode = 429; // Too Many Requests

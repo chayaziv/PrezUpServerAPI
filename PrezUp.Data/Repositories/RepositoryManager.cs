@@ -9,7 +9,7 @@ using PrezUp.Core.IRepositories;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 namespace PrezUp.Data.Repositories
 {
-   public class RepositoryManager:IRepositoryManager
+    public class RepositoryManager : IRepositoryManager
     {
         private readonly DataContext _context;
         public IPresentationRepository Presentations { get; }
@@ -17,12 +17,15 @@ namespace PrezUp.Data.Repositories
         public IUserRepository Users { get; }
 
         public IRoleRepository Roles { get; }
-        public RepositoryManager(DataContext context, IPresentationRepository presentations, IUserRepository users,IRoleRepository roles)
+
+        public IRepository<Tag> Tags { get; }
+        public RepositoryManager(DataContext context, IPresentationRepository presentations, IUserRepository users, IRoleRepository roles, IRepository<Tag> tags)
         {
             _context = context;
             Presentations = presentations;
             Users = users;
             Roles = roles;
+            Tags = tags;
         }
         public async Task<int> SaveAsync()
         {

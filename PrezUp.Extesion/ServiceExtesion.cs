@@ -27,6 +27,7 @@ namespace PrezUp.Extesion
             s.AddScoped<IUserService, UserService>();
             s.AddScoped<IAuthService, AuthService>();
             s.AddScoped<IAdminService, AdminService>();
+            s.AddScoped<ITagService, TagService>();
 
             s.AddScoped<IRepositoryManager, RepositoryManager>();
             s.AddScoped(typeof(IRepository<>), typeof(Repository<>));

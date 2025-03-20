@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -14,7 +15,7 @@ namespace PrezUp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    
+
     [Authorize(Policy = "UserOrAdmin")]
 
     public class PresentationController : ControllerBase
@@ -22,16 +23,20 @@ namespace PrezUp.API.Controllers
         readonly IPresentationService _presentationService;
         readonly IMapper _mapper;
 
-        public PresentationController(IPresentationService service,IMapper mapper)
+        public PresentationController(IPresentationService service, IMapper mapper)
         {
             _presentationService = service;
             _mapper = mapper;
         }
+
         [HttpPost("analyze-audio")]
-        
-        public async Task<IActionResult> AnalyzeAudio([FromForm] IFormFile audio, [FromForm] bool isPublic, [FromForm] string title)
+        public async Task<IActionResult> AnalyzeAudio(
+            [FromForm] IFormFile audio,
+            [FromForm] bool isPublic,
+            [FromForm] string title,
+            [FromForm] string tagsJson)
         {
-            if(string.IsNullOrWhiteSpace(title))
+            if (string.IsNullOrWhiteSpace(title))
             {
                 return BadRequest(new { error = "Title is required" });
             }
@@ -39,11 +44,18 @@ namespace PrezUp.API.Controllers
             {
                 return BadRequest(new { error = "No audio file provided" });
             }
+            List<TagDTO>tags = new List<TagDTO>();
+            Console.WriteLine(  "----------");
+            Console.WriteLine(  tagsJson);
+            Console.WriteLine("----------");
 
             try
             {
-
-             
+                if (!string.IsNullOrEmpty(tagsJson))
+                {
+                    tags = JsonSerializer.Deserialize<List<TagDTO>>(tagsJson);
+                }
+                   
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim == null)
                 {
@@ -51,19 +63,24 @@ namespace PrezUp.API.Controllers
                 }
 
                 int userId = int.Parse(userIdClaim.Value);
-               
-           
-                var result  = await _presentationService.AnalyzeAudioAsync(audio, isPublic,title, userId);
-                if(result.IsSuccess)
+
+
+                var result = await _presentationService.AnalyzeAudioAsync(audio, isPublic, title, userId, tagsJson);
+                if (result.IsSuccess)
                 {
-                  
-                    return StatusCode(result.StatusCode, new { data = result.Data ,messege= "Audio analyzed successfully" });
+
+                    return StatusCode(result.StatusCode, new { data = result.Data, messege = "Audio analyzed successfully" });
                 }
                 else
                 {
-                    return StatusCode(result.StatusCode, new {messege=result.ErrorMessage});
+                    return StatusCode(result.StatusCode, new { messege = result.ErrorMessage });
                 }
-                                
+
+            }
+            catch (JsonException)
+            {
+                
+                return StatusCode(500, new { error = "Invalid tags format." });
             }
             catch (Exception ex)
             {
@@ -76,7 +93,7 @@ namespace PrezUp.API.Controllers
             var result = await _presentationService.getallAsync();
             if (!result.IsSuccess)
                 return StatusCode(result.StatusCode, new { message = result.ErrorMessage });
-           
+
             return StatusCode(result.StatusCode, new { data = result.Data });
         }
 
@@ -99,7 +116,7 @@ namespace PrezUp.API.Controllers
         }
 
         [HttpDelete("{id}")]
-      
+
         public async Task<IActionResult> DeletePresentation(int id)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -108,6 +125,6 @@ namespace PrezUp.API.Controllers
                 return StatusCode(result.StatusCode, new { message = result.ErrorMessage });
             return NoContent();
         }
-        
+
     }
 }

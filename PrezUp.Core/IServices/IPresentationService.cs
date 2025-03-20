@@ -19,7 +19,7 @@ namespace PrezUp.Core.IServices
 
         public Task<Result<bool>> deleteAsync(int id, int userId);
 
-        Task<Result<PresentationDTO>> AnalyzeAudioAsync(IFormFile audio, bool isPublic,string title, int userId);
+        Task<Result<PresentationDTO>> AnalyzeAudioAsync(IFormFile audio, bool isPublic,string title, int userId, string tagsJson);
 
         public Task<Result<List<PresentationDTO>>> GetPublicPresentationsAsync();
         
