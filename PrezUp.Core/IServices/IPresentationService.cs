@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using PrezUp.Core.Entity;
 using PrezUp.Core.EntityDTO;
 using PrezUp.Core.models;
 using PrezUp.Core.Utils;
@@ -21,5 +22,6 @@ namespace PrezUp.Core.IServices
         Task<Result<PresentationDTO>> AnalyzeAudioAsync(IFormFile audio, bool isPublic,string title, int userId);
 
         public Task<Result<List<PresentationDTO>>> GetPublicPresentationsAsync();
+        
     }
 }

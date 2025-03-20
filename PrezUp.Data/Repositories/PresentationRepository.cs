@@ -16,28 +16,19 @@ namespace PrezUp.Data.Repositories
         {
         }
 
-        public async Task<List<Presentation>> GetPresentationsByUserIdAsync(int userId)
-        {
-            return await _dbSet.Where(pres => pres.UserId == userId).ToListAsync();
-        }
-        public async Task<List<Presentation>> GetPublicPresentationsAsync()
-        {
-            return await _dbSet.Where(pres => pres.IsPublic).ToListAsync();
-        }
+        public async Task<List<Presentation>> GetPresentationsByUserIdAsync(int userId) =>
+            await _dbSet.Where(pres => pres.UserId == userId).ToListAsync();
 
+        public async Task<List<Presentation>> GetPublicPresentationsAsync() =>
+            await _dbSet.Where(pres => pres.IsPublic).ToListAsync();
 
-        public async Task<int> GetTotalPresentationsAsync() => await _dbSet.CountAsync();
-        public async Task<int> GetPublicPresentationsCountAsync() => await _dbSet.CountAsync(p => p.IsPublic);
-        //public async Task<List<TopUserDto>> GetTopUsersAsync()
-        //{
-        //    return await _dbSet
-        //        .OrderByDescending(u => u.Presentations.Count)
-        //        .Take(5)
-        //        .Select(u => new TopUserDto { UserId = u.Id, UserName = u.Name, PresentationsCount = u.Presentations.Count() })
-        //        .ToListAsync();
-        //}
+        public async Task<int> GetTotalPresentationsAsync() =>
+            await _dbSet.CountAsync();
 
+        public async Task<int> GetPublicPresentationsCountAsync() =>
+            await _dbSet.CountAsync(p => p.IsPublic);
 
-
+        public async Task<List<Presentation>> GetPublicWithTagsAsync() =>
+            await _dbSet.Include(p => p.Tags).Where(pres => pres.IsPublic).ToListAsync();
     }
 }

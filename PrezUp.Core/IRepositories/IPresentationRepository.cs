@@ -9,11 +9,11 @@ namespace PrezUp.Core.IRepositories
 {
     public interface IPresentationRepository : IRepository<Presentation>
     {
-        public Task<List<Presentation>> GetPresentationsByUserIdAsync(int userId);
-    
-        public Task<List<Presentation>> GetPublicPresentationsAsync();
+        Task<List<Presentation>> GetPresentationsByUserIdAsync(int userId);
+        Task<List<Presentation>> GetPublicPresentationsAsync();
         Task<int> GetTotalPresentationsAsync();
-        public Task<int> GetPublicPresentationsCountAsync();
+        Task<int> GetPublicPresentationsCountAsync();
+        Task<List<Presentation>> GetPublicWithTagsAsync();
     }
 }
 ;

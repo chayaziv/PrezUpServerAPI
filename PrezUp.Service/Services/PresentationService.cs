@@ -81,8 +81,13 @@ namespace PrezUp.Service.Services
 
         public async Task<Result<List<PresentationDTO>>> GetPublicPresentationsAsync()
         {
-            var list = await _repository.Presentations.GetPublicPresentationsAsync();
+            var list = await _repository.Presentations.GetPublicWithTagsAsync();
+            Console.WriteLine(  "---------------------------------------------------------------------------");
+            Console.WriteLine(list.First().Tags.First().Name);
             var listDTOs = list.Select(item => _mapper.Map<PresentationDTO>(item)).ToList();
+            Console.WriteLine("---------------------------------------------------------------------------");
+            Console.WriteLine(listDTOs.First().Tags.First().Name);
+            Console.WriteLine("---------------------------------------------------------------------------");
             return Result<List<PresentationDTO>>.Success(listDTOs);
         }
 

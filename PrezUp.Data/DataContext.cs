@@ -27,19 +27,6 @@ namespace PrezUp.Data
             base.OnConfiguring(optionsBuilder);
             optionsBuilder.LogTo(mesege => Console.Write(mesege));
         }
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //    base.OnModelCreating(modelBuilder);
-
-        //    // הגדרת הקשר Many-to-Many בין Presentation ל-Tag
-        //    modelBuilder.Entity<Presentation>()
-        //        .HasMany(p => p.Tags)
-        //        .WithMany(t => t.Presentations)
-        //        .UsingEntity<Dictionary<string, object>>(
-        //            "PresentationTag",  // שם טבלת הקישור
-        //            j => j.HasOne<Tag>().WithMany().HasForeignKey("TagId"),  // Foreign Key מצד ה-Tag
-        //            j => j.HasOne<Presentation>().WithMany().HasForeignKey("PresentationId")  // Foreign Key מצד ה-Presentation
-        //        );
-        //}
+       
     }
 }

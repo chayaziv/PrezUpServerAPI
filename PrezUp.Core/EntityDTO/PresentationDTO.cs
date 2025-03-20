@@ -34,8 +34,8 @@ namespace PrezUp.Core.EntityDTO
         public bool IsPublic { get; set; }
       
         public int UserId { get; set; }
-       
 
+        public List<TagDTO> Tags { get; set; } = new();
 
     }
 }

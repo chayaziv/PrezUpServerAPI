@@ -10,7 +10,10 @@ namespace PrezUp.Core
     {
         public AutoMapperProfile()
         {
-            CreateMap<Presentation, PresentationDTO>().ReverseMap();
+           CreateMap<Tag, TagDTO>().ReverseMap();
+            CreateMap<PresentationDTO, Presentation>();
+            CreateMap<Presentation, PresentationDTO>()
+            .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags));
 
             CreateMap<Analysis, Presentation>();
 
@@ -26,11 +29,12 @@ namespace PrezUp.Core
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Roles.Any() ? src.Roles.First() : new Role() { Id = 0, RoleName = "unknown" }))
                     .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.PasswordHash))
                      .ReverseMap()
-    .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => EncryptPassword( src.Password)));
+                     .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => EncryptPassword( src.Password)));
     
 
 
             CreateMap<UserAdminDTO, UserDTO>();
+           
 
         }
 
