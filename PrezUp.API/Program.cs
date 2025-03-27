@@ -7,6 +7,8 @@ using PrezUp.API.MiddleWares;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using dotenv.net;
+using Microsoft.EntityFrameworkCore;
+using PrezUp.Data;
 
 
 // טעינת משתני סביבה מ-.env
@@ -35,6 +37,7 @@ builder.Services.AddAuthenticationServices(builder.Configuration);
 builder.Services.ServieDependencyInjector(builder.Configuration);
 builder.Services.AddCorsPolicy();
 builder.Services.AddAutoMapper(typeof(MappingPostEntity));
+
 
 bool isLogged = false;
 if (isLogged)

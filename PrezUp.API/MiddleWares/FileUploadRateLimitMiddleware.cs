@@ -1,5 +1,6 @@
 ﻿namespace PrezUp.API.MiddleWares
 {
+    //CONNECTION_STRING=Data Source = DESKTOP-13C4MS2; Initial Catalog = PrezUp_DB; Integrated Security = true;TrustServerCertificate=True
     public class FileUploadRateLimitMiddleware
     {
         private readonly RequestDelegate _next;

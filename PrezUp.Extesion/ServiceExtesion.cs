@@ -46,8 +46,9 @@ namespace PrezUp.Extesion
 
             s.AddDbContext<DataContext>(optionsBuilder =>
             {
-                optionsBuilder.UseSqlServer(connectionString);
-            });
+                //optionsBuilder.UseSqlServer(connectionString);
+                optionsBuilder.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 34)));
+        });
 
 
         }
