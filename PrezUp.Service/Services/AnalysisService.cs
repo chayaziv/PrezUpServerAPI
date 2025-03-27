@@ -9,6 +9,8 @@ using PrezUp.Core.IServices;
 using PrezUp.Core.models;
 using PrezUp.Core.Utils;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace PrezUp.Service.Services
 {
@@ -29,16 +31,14 @@ namespace PrezUp.Service.Services
 
             using var client = _httpClientFactory.CreateClient();
 
+            var requestData = new { audioUrl = fileUrl };
+            var jsonContent = new StringContent(JsonConvert.SerializeObject(requestData), Encoding.UTF8, "application/json");
 
-            using var responseStream = await client.GetStreamAsync(fileUrl);
-            using var content = new MultipartFormDataContent
-    {
-        { new StreamContent(responseStream), "audio", "temp_audio.wav" }
-    };
             try
             {
-                var response = await client.PostAsync(_configuration["AnalysisApi:Url"], content);
-                Console.WriteLine(  "!!!!!!!!!!!!!!!!!!!\n\n\n"+response+"\n\n\n!!!!!!!!!!!!!!!!!!!!!");
+                var response = await client.PostAsync(_configuration["AnalysisApi:Url"], jsonContent);
+
+                Console.WriteLine("!!!!!!!!!!!!!!!!!!!\n\n\n" + response + "\n\n\n!!!!!!!!!!!!!!!!!!!!!");
                 if (!response.IsSuccessStatusCode)
                 {
 
@@ -71,6 +71,7 @@ namespace PrezUp.Service.Services
                 return Result<Analysis>.Failure($"Error {e.Message}");
             }
         }
+       
 
         private Analysis ParseAnalysisResult(JObject jsonObject)
         {
