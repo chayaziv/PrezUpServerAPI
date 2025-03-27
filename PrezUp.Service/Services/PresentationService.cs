@@ -39,54 +39,28 @@ namespace PrezUp.Service.Services
         {
 
             string fileKey = $"recordings/{Guid.NewGuid()}.wav";
-            //var S3Result = await _audioUploadService.UploadFileToS3Async(audio.OpenReadStream(), fileKey);
-            //if (!S3Result.IsSuccess)
-            //{
-            //    return Result<PresentationDTO>.Failure(S3Result.ErrorMessage);
-            //}
-            //var fileUrl = S3Result.Data.Url;
-            var fileUrl = "BSD";
-            //var NLPResult = await _audioAnalysisService.AnalyzeAudioAsync(fileUrl);
-            //if (!NLPResult.IsSuccess)
-            //{
-            //    return Result<PresentationDTO>.Failure("error in NLP");
-            //}
+            var S3Result = await _audioUploadService.UploadFileToS3Async(audio.OpenReadStream(), fileKey);
+            if (!S3Result.IsSuccess)
+            {
+                return Result<PresentationDTO>.Failure(S3Result.ErrorMessage);
+            }
+            var fileUrl = S3Result.Data.Url;
 
-            //Presentation presentation = _mapper.Map<Presentation>(NLPResult.Data);
+            var NLPResult = await _audioAnalysisService.AnalyzeAudioAsync(fileUrl);
+            if (!NLPResult.IsSuccess)
+            {
+                return Result<PresentationDTO>.Failure("error in NLP");
+            }
 
-            Presentation presentation = new Presentation() { 
-                IsPublic=isPublic,
-                FileUrl="BSD",
-                UserId = userId,
-                Title = title,
-                Clarity=2,
-                ClarityFeedback="2",
-                Fluency=2,
-                FluencyFeedback="9",
-                Confidence=8,
-                ConfidenceFeedback="qq",
-                Engagement=9,
-                EngagementFeedback="uu",
-                SpeechStyle=2,
-                SpeechStyleFeedback="HG",
-                Score=7,
-                Tips="tips"
-
-
-            };
-       
-        
-
-        //presentation.IsPublic = isPublic;
-        //    presentation.FileUrl = fileUrl ?? "";
-        //    presentation.UserId = userId;
-        //    presentation.Title = title ?? "";
-            Console.WriteLine("+++++++++++++++++++++++++++++++++++++");
+            Presentation presentation = _mapper.Map<Presentation>(NLPResult.Data);
+            presentation.IsPublic = isPublic;
+            presentation.FileUrl = fileUrl ?? "";
+            presentation.UserId = userId;
+            presentation.Title = title ?? "";
             var res = await UpdateTagsAsync(presentation, tagsJson);
-            Console.WriteLine("888888888888888888888888888888888888888");
             if (!res.IsSuccess)
                 return Result<PresentationDTO>.Failure("error in UpdateTagsAsync");
-            Console.WriteLine("_________________________________");
+
             await _repository.Presentations.AddAsync(presentation);
             if (await _repository.SaveAsync() == 0)
             {
@@ -141,12 +115,7 @@ namespace PrezUp.Service.Services
         public async Task<Result<List<PresentationDTO>>> GetPublicPresentationsAsync()
         {
             var list = await _repository.Presentations.GetPublicWithTagsAsync();
-            Console.WriteLine("---------------------------------------------------------------------------");
-            Console.WriteLine(list.First().Tags.First().Name);
             var listDTOs = list.Select(item => _mapper.Map<PresentationDTO>(item)).ToList();
-            Console.WriteLine("---------------------------------------------------------------------------");
-            Console.WriteLine(listDTOs.First().Tags.First().Name);
-            Console.WriteLine("---------------------------------------------------------------------------");
             return Result<List<PresentationDTO>>.Success(listDTOs);
         }
 

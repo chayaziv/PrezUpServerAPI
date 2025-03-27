@@ -19,6 +19,7 @@ namespace PrezUp.Data.Repositories
         public IRoleRepository Roles { get; }
 
         public IRepository<Tag> Tags { get; }
+       // public INotificationRepository Notifications { get; }
         public RepositoryManager(DataContext context, IPresentationRepository presentations, IUserRepository users, IRoleRepository roles, IRepository<Tag> tags)
         {
             _context = context;
@@ -26,6 +27,7 @@ namespace PrezUp.Data.Repositories
             Users = users;
             Roles = roles;
             Tags = tags;
+            //Notifications = notifications;
         }
         public async Task<int> SaveAsync()
         {

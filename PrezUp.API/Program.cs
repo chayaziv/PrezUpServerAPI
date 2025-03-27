@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -7,8 +6,26 @@ using PrezUp.Extesion;
 using PrezUp.API.MiddleWares;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using dotenv.net;
+
+
+// טעינת משתני סביבה מ-.env
+DotEnv.Load();
 
 var builder = WebApplication.CreateBuilder(args);
+
+// עדכון הגדרות ה-JWT ממשתני הסביבה
+builder.Configuration["Jwt:Key"] = Environment.GetEnvironmentVariable("JWT_KEY");
+builder.Configuration["Jwt:Issuer"] = Environment.GetEnvironmentVariable("JWT_ISSUER");
+builder.Configuration["Jwt:Audience"] = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+
+// עדכון הגדרות ה-AWS ממשתני הסביבה
+builder.Configuration["AWS:AccessKey"] = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY");
+builder.Configuration["AWS:SecretKey"] = Environment.GetEnvironmentVariable("AWS_SECRET_KEY");
+builder.Configuration["AWS:BucketName"] = Environment.GetEnvironmentVariable("AWS_BUCKET_NAME");
+
+// עדכון Connection String ממשתני הסביבה
+builder.Configuration["ConnectionStrings:DefaultConnection"] = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
 builder.Services.AddControllers();
 builder.Services.AddAuthenticationServices(builder.Configuration);
