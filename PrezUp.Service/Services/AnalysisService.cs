@@ -36,7 +36,7 @@ namespace PrezUp.Service.Services
 
             try
             {
-                var response = await client.PostAsync(_configuration["AnalysisApi:Url"], jsonContent);
+                var response = await client.PostAsync("https://prezupnlp.onrender.com/analyze-audio", jsonContent);
 
                 Console.WriteLine("!!!!!!!!!!!!!!!!!!!\n\n\n" + response + "\n\n\n!!!!!!!!!!!!!!!!!!!!!");
                 if (!response.IsSuccessStatusCode)
