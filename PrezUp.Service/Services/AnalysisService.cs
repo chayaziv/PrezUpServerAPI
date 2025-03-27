@@ -8,25 +8,28 @@ using PrezUp.Core.EntityDTO;
 using PrezUp.Core.IServices;
 using PrezUp.Core.models;
 using PrezUp.Core.Utils;
+using Microsoft.Extensions.Configuration;
 
 namespace PrezUp.Service.Services
 {
     public class AnalysisService : IAnalysisService
     {
         private readonly IHttpClientFactory _httpClientFactory;
-        
+        private readonly IConfiguration _configuration;
 
-        public AnalysisService(IHttpClientFactory httpClientFactory)
+
+        public AnalysisService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
         }
 
         public async Task<Result<Analysis>> AnalyzeAudioAsync(string fileUrl)
         {
-           
+
             using var client = _httpClientFactory.CreateClient();
 
-          
+
             using var responseStream = await client.GetStreamAsync(fileUrl);
             using var content = new MultipartFormDataContent
     {
@@ -34,38 +37,37 @@ namespace PrezUp.Service.Services
     };
             try
             {
-                var response = await client.PostAsync("http://localhost:5000/analyze-audio", content);
-
+                var response = await client.PostAsync(_configuration["AnalysisApi:Url"], content);
+                Console.WriteLine(  "!!!!!!!!!!!!!!!!!!!\n\n\n"+response+"\n\n\n!!!!!!!!!!!!!!!!!!!!!");
                 if (!response.IsSuccessStatusCode)
                 {
-                 
+
                     return Result<Analysis>.Failure("failed to analyze audio ");
                 }
-
+                Console.WriteLine("after NLP\n\n");
                 var responseContent = await response.Content.ReadAsStringAsync();
-                //var cleanedContent = responseContent.Replace("```json", "").Replace("```", "").Trim();
-                //JObject jsonObject = JObject.Parse(cleanedContent);
-                // מוצא את האינדקס של "```json"
+
                 int jsonStartIndex = responseContent.IndexOf("```json");
 
                 if (jsonStartIndex != -1)
                 {
-                    // חותך את כל מה שלפני "```json"
-                    responseContent = responseContent.Substring(jsonStartIndex + 7); // 7 כי "```json" זה 7 תווים
+
+                    responseContent = responseContent.Substring(jsonStartIndex + 7);
                 }
 
-                // מנקה את התוכן משאריות של ```  
+
                 var cleanedContent = responseContent.Replace("```", "").Trim();
 
-                // ממיר ל- JObject
+
                 JObject jsonObject = JObject.Parse(cleanedContent);
-                //----------
-                var analysis= ParseAnalysisResult(jsonObject);
-                return Result<Analysis>.Success( analysis);
+
+                var analysis = ParseAnalysisResult(jsonObject);
+                return Result<Analysis>.Success(analysis);
             }
             catch (Exception e)
             {
-              
+                Console.WriteLine("erorrrrrrrrrrrrrrrrrrrrrrrrrrrrr\n\n");
+
                 return Result<Analysis>.Failure($"Error {e.Message}");
             }
         }

@@ -45,11 +45,11 @@ namespace PrezUp.Service.Services
                 return Result<PresentationDTO>.Failure(S3Result.ErrorMessage);
             }
             var fileUrl = S3Result.Data.Url;
-
+            Console.WriteLine(fileUrl);
             var NLPResult = await _audioAnalysisService.AnalyzeAudioAsync(fileUrl);
             if (!NLPResult.IsSuccess)
             {
-                return Result<PresentationDTO>.Failure("error in NLP");
+                return Result<PresentationDTO>.Failure(NLPResult.ErrorMessage);
             }
 
             Presentation presentation = _mapper.Map<Presentation>(NLPResult.Data);

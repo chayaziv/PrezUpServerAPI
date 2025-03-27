@@ -27,6 +27,9 @@ builder.Configuration["AWS:BucketName"] = Environment.GetEnvironmentVariable("AW
 // עדכון Connection String ממשתני הסביבה
 builder.Configuration["ConnectionStrings:DefaultConnection"] = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
+// עדכון כתובת ה-API ממשתני הסביבה
+builder.Configuration["AnalysisApi:Url"] = Environment.GetEnvironmentVariable("ANALYSIS_API_URL");
+
 builder.Services.AddControllers();
 builder.Services.AddAuthenticationServices(builder.Configuration);
 builder.Services.ServieDependencyInjector(builder.Configuration);
